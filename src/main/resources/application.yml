@@ -1,13 +1,29 @@
 micronaut:
   application:
     name: gitlabstatscrawler
-datasources:
-  default:
-    url: jdbc:postgresql://localhost:5432/postgres
-    driverClassName: org.postgresql.Driver
-    username: postgres
-    password: ''
+
 netty:
   default:
     allocator:
       max-order: 3
+
+jackson:
+  serialization:
+    indentOutput: true
+    writeDatesAsTimestamps: false
+  deserialization:
+    useBigIntegerForInts: true
+    failOnUnknownProperties: false
+    adjustDatesToContextTimeZone: false
+  json-view:
+    enabled: true
+
+datasources:
+  default:
+    driverClassName: 'org.postgresql.Driver'
+    endpoint: ${DATABASE_HOST}:5432
+    database: ${DATABASE_NAME}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://${datasources.default.endpoint}/${datasources.default.database}?stringtype=unspecified&sslmode=require
+
