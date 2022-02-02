@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.kapt") version "1.6.10"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.6.10"
     id("com.github.johnrengelman.shadow") version "7.1.1"
+    id "io.gitlab.arturbosch.detekt" version "1.18.1"
     id("io.micronaut.application") version "3.2.0"
 }
 
@@ -44,6 +45,25 @@ java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
 
+detekt {
+    config = files("detekt.yml")
+    parallel = false
+    debug = false
+    ignoreFailures = false
+
+    reports {
+        html {
+            enabled = true
+            destination = file("build/reports/detekt.html")
+        }
+        txt {
+            enabled = true
+            destination = file("build/reports/detekt.txt")
+        }
+    }
+}
+
+
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -65,5 +85,4 @@ micronaut {
         annotations("no.masterthesis.*")
     }
 }
-
 

@@ -1,4 +1,5 @@
 package no.masterthesis
+
 import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
@@ -8,12 +9,12 @@ import jakarta.inject.Inject
 @MicronautTest
 class GitlabstatscrawlerTest {
 
-    @Inject
-    lateinit var application: EmbeddedApplication<*>
+  @Inject
+  lateinit var application: EmbeddedApplication<*>
 
-    @Test
-    fun testItWorks() {
-        Assertions.assertTrue(application.isRunning)
-    }
+  @Test
+  fun testItWorks() {
+    Assertions.assertTrue(application.isRunning)
+  }
 
 }
