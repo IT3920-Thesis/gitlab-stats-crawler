@@ -26,5 +26,19 @@ hs_err_pid*
 .gradle
 build
 
-
 secrets.env
+
+
+
+### Terraform ###
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Contains typically any non auto-retrievable or generated secrets
+terraform/**/secrets.auto.tfvars

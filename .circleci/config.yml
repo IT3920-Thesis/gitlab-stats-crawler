@@ -1,0 +1,130 @@
+version: 2.1
+
+jobs:
+  package-jar:
+    docker:
+      - image: gradle:7.3.3-jdk17
+    working_directory: ~/repo
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Package JAR
+          command: gradle clean assemble
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+#
+#  push-docker-image:
+#    machine: true
+#    steps:
+#      - checkout
+#      - run:
+#          name: Install AWS-cli
+#          command: |
+#            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#            unzip awscliv2.zip
+#            sudo ./aws/install
+#      - run:
+#          name: Docker Login to ECR
+#          environment:
+#            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
+#            AWS_DEFAULT_REGION: us-east-1
+#            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
+#          command: aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_BASE_URL
+#      - run:
+#          name: Build
+#          environment:
+#            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
+#            AWS_DEFAULT_REGION: us-east-1
+#            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
+#          command: docker build -t $ECR_BASE_URL/gitlab-stats-crawler:$CIRCLE_SHA1 .
+#      - run:
+#          name: Push
+#          environment:
+#            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
+#            AWS_DEFAULT_REGION: us-east-1
+#            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
+#          command: docker push $ECR_BASE_URL/gitlab-stats-crawler:$CIRCLE_SHA1
+#  plan-staging:
+#    docker:
+#      - image: lindhagen/terraform-azure-util:1.1.4
+#    working_directory: ~/repo
+#    steps:
+#      - checkout
+#      - run:
+#          command: export AWS_DEFAULT_REGION=us-east-1
+#      - run:
+#          name: Set docker image tag
+#          command: export TF_ENV_docker_image_tag=${CIRCLE_SHA1}
+#      - run:
+#          name: Terraform plan Staging
+#          environment:
+#            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
+#            AWS_DEFAULT_REGION: us-east-1
+#            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
+#          command: |
+#            cd terraform/staging
+#            terraform init -input=false
+#            terraform plan -out staging.tfapply
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - .
+#  apply-staging:
+#    docker:
+#      - image: lindhagen/terraform-azure-util:0.14.3
+#    working_directory: ~/repo
+#    steps:
+#      - checkout
+#      - attach_workspace:
+#          at: .
+#      - run:
+#          name: Set docker image tag
+#          command: export TF_ENV_docker_image_tag=${CIRCLE_SHA1}
+#      - run:
+#          name: Terraform staging
+#          environment:
+#            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
+#            AWS_DEFAULT_REGION: us-east-1
+#            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
+#          command: |
+#            cd terraform/staging
+#            terraform apply -auto-approve staging.tfapply
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - .
+
+workflows:
+  main:
+    jobs:
+      - package-jar
+#      - push-docker-image:
+#          context:
+#            - Ferje Context
+#          filters:
+#            branches:
+#              only: master
+#      - plan-staging:
+#          context:
+#            - Ferje Context
+#      - apply-taging:
+#          context:
+#            - Ferje Context
+#          requires:
+#            - push-docker-image
+#            - plan-production
+#          filters:
+#            branches:
+#              only: master

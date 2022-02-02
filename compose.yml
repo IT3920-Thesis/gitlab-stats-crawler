@@ -1,0 +1,25 @@
+
+services:
+  db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: gitlabstats
+      POSTGRES_PASSWORD: somepassword
+      POSTGRES_DB: gitlabstats
+      POSTGRES_HOST_AUTH_METHOD: trust
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ./docker/run_dev.sh
+    volumes:
+      - .:/app/
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: gitlabstats
+      DATABASE_USER: gitlabstats
+      DATABASE_PASSWORD: somepassword

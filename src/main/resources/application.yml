@@ -1,6 +1,28 @@
 micronaut:
   application:
     name: gitlabstatscrawler
+  server:
+    port: 8080
+    cors: false
+
+  http:
+    client:
+      max-content-length: 104857600 # 100mb max content length
+      read-timeout: 60s
+
+  security:
+    enabled: false
+
+endpoints:
+  # All endpoints should explicitly be disabled
+  all:
+    enabled: false
+  health:
+    enabled: true
+    sensitive: false
+#  prometheus:
+#    enabled: true
+#    sensitive: true
 
 netty:
   default:
@@ -25,5 +47,5 @@ datasources:
     database: ${DATABASE_NAME}
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
-    url: jdbc:postgresql://${datasources.default.endpoint}/${datasources.default.database}?stringtype=unspecified&sslmode=require
+    url: jdbc:postgresql://${datasources.default.endpoint}/${datasources.default.database}?stringtype=unspecified
 
