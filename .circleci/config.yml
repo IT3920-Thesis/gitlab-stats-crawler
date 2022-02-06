@@ -93,10 +93,18 @@ workflows:
           filters:
             branches:
               only: main
-      - apply-taging:
+      # Holds deploying changes to staging, by requiring manual approval
+      - hold-staging:
+          filters:
+            branches:
+              only: main
+          type: approval
           requires:
-            - push-docker-image
             - plan-staging
+            - push-docker-image
+      - apply-staging:
+          requires:
+            - hold-staging
           filters:
             branches:
               only: main

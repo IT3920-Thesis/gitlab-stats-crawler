@@ -1,3 +1,21 @@
+resource "random_password" "database_password" {
+  length = 64
+  special = false
+}
+
+
+resource "aws_db_instance" "database" {
+  allocated_storage = 20
+  apply_immediately = true
+  auto_minor_version_upgrade = true
+  engine = "postgres"
+  engine_version = "14.1"
+  instance_class = "db.t4g.small"
+  name = replace("${var.application_name}${var.environment}", "-", "")
+  username = "gitlabcrawler"
+  password = random_password.database_password.result
+  skip_final_snapshot = true
+}
 
 resource "aws_iam_role" "application_image_builder" {
   name = "${var.application_name}-${var.environment}-deploy"
@@ -20,7 +38,7 @@ resource "aws_iam_role" "application_image_builder" {
 }
 
 resource "aws_iam_role_policy_attachment" "application_image_builder" {
-  role       = aws_iam_role.application_image_builder.name
+  role = aws_iam_role.application_image_builder.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess"
 }
 
@@ -42,6 +60,13 @@ resource "aws_apprunner_service" "application" {
     image_repository {
       image_configuration {
         port = "8080"
+
+        runtime_environment_variables = {
+          DATABASE_HOST = aws_db_instance.database.endpoint
+          DATABASE_NAME = aws_db_instance.database.name
+          DATABASE_USER = aws_db_instance.database.username
+          DATABASE_PASSWORD = random_password.database_password.result
+        }
       }
       image_identifier = "${var.ecr_image_url}:${var.image_tag}"
       image_repository_type = "ECR"
