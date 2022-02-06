@@ -57,30 +57,30 @@ jobs:
           root: .
           paths:
             - .
-#  apply-staging:
-#    docker:
-#      - image: lindhagen/terraform-azure-util:0.14.3
-#    working_directory: ~/repo
-#    steps:
-#      - checkout
-#      - attach_workspace:
-#          at: .
-#      - run:
-#          name: Set docker image tag
-#          command: export TF_ENV_docker_image_tag=${CIRCLE_SHA1}
-#      - run:
-#          name: Terraform staging
-#          environment:
-#            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
-#            AWS_DEFAULT_REGION: us-east-1
-#            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
-#          command: |
-#            cd terraform/staging
-#            terraform apply -auto-approve staging.tfapply
-#      - persist_to_workspace:
-#          root: .
-#          paths:
-#            - .
+  apply-staging:
+    docker:
+      - image: lindhagen/terraform-azure-util:1.1.4
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Set docker image tag
+          command: export TF_ENV_docker_image_tag=${CIRCLE_SHA1}
+      - run:
+          name: Terraform staging
+          environment:
+            # Set default region here to prevent circleci from masking us-east-1 in terraform plans
+            AWS_DEFAULT_REGION: us-east-1
+            ECR_BASE_URL: "314397620259.dkr.ecr.us-east-1.amazonaws.com"
+          command: |
+            cd terraform/staging
+            terraform apply -auto-approve staging.tfapply
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
 workflows:
   main:
@@ -89,13 +89,14 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-      - plan-staging
-#      - apply-taging:
-#          context:
-#            - Ferje Context
-#          requires:
-#            - push-docker-image
-#            - plan-production
-#          filters:
-#            branches:
-#              only: master
+      - plan-staging:
+          filters:
+            branches:
+              only: main
+      - apply-taging:
+          requires:
+            - push-docker-image
+            - plan-staging
+          filters:
+            branches:
+              only: main
