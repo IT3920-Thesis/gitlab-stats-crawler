@@ -42,6 +42,10 @@ dependencies {
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesCoreVersion")
+    // Includes valuable extensions to the Reactor types, such as Mono
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxCoroutinesCoreVersion")
+
     // Better assertion methods
     testImplementation("io.strikt:strikt-core:$striktVersion")
 }
