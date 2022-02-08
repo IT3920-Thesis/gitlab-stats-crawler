@@ -20,6 +20,7 @@ import java.time.ZonedDateTime
 data class GitlabGitCommit(
   val id: String,
   val title: String,
+  val message: String?,
   val authorName: String,
   val authorEmail: String?,
   // We might need to add some additional packages to Jackson

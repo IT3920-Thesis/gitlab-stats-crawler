@@ -12,6 +12,7 @@ interface GitlabApiClient {
   /**
    * Retrieves the complete list of Git commits in the specified
    * Gitlab project.
+   * @link https://docs.gitlab.com/ee/api/commits.html#list-repository-commits
    * */
   @Get(
     uri = "/api/v4/projects/{projectId}/repository/commits?all=true",
@@ -21,6 +22,7 @@ interface GitlabApiClient {
 
   /**
    * Retrieves a list of changes to a specific commit
+   * @link https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
    * */
   @Get(
     uri = "/api/v4/projects/{projectId}/repository/commits/{commitSha}/diff",
