@@ -35,7 +35,12 @@ jackson:
     writeDatesAsTimestamps: false
   deserialization:
     useBigIntegerForInts: true
+    # It is recommended to simply ignore properties in a JSON structure
+    # that our data class / structure haven't declared, because it decouples
+    # the JSON-schema from the application. We can later add new properties, or remove unused ones without
+    # resulting in cascading failures to consuming applications.
     failOnUnknownProperties: false
+    # ALWAYS use UTC
     adjustDatesToContextTimeZone: false
   json-view:
     enabled: true
@@ -43,9 +48,7 @@ jackson:
 datasources:
   default:
     driverClassName: 'org.postgresql.Driver'
-    endpoint: ${DATABASE_HOST}:5432
-    database: ${DATABASE_NAME}
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
-    url: jdbc:postgresql://${datasources.default.endpoint}/${datasources.default.database}?stringtype=unspecified
+    url: ${DATABASE_URI}
 

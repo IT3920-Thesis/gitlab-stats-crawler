@@ -1,7 +1,7 @@
 
 services:
   db:
-    image: postgres:13
+    image: postgres:14
     ports:
       - "5432:5432"
     environment:
@@ -12,14 +12,17 @@ services:
   app:
     build:
       context: .
+      # This Dockerfile is more tailored for local development and continuous
+      # recompilation. Use docker compose restart app to trigger a rebuild
       dockerfile: docker/Dockerfile
     command: ./docker/run_dev.sh
+    ports:
+      - "8080:8080"
     volumes:
       - .:/app/
     depends_on:
       - db
     environment:
-      DATABASE_HOST: db
-      DATABASE_NAME: gitlabstats
       DATABASE_USER: gitlabstats
       DATABASE_PASSWORD: somepassword
+      DATABASE_URI: jdbc:postgresql://db:5432/gitlabstats?stringtype=unspecified
