@@ -22,6 +22,8 @@ services:
       - .:/app/
     depends_on:
       - db
+    env_file:
+      - secrets.env
     environment:
       DATABASE_USER: gitlabstats
       DATABASE_PASSWORD: somepassword

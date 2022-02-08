@@ -4,7 +4,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 
 object LocalPostgreSQLContainer {
-  class KPostgreSQLContainer : PostgreSQLContainer<KPostgreSQLContainer>(DockerImageName.parse("postgres:13.1"))
+  class KPostgreSQLContainer : PostgreSQLContainer<KPostgreSQLContainer>(DockerImageName.parse("postgres:14"))
 
   const val DATABASE_NAME = "costmanager"
   const val DATABASE_USER = "testuser"

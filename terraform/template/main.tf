@@ -67,6 +67,7 @@ resource "aws_apprunner_service" "application" {
           // We require SSL but aren't currently validating the actual certificate
           // (We need to provide the certificate if we want to validate it)
           DATABASE_URI = "jdbc:postgresql://${aws_db_instance.database.endpoint}/${aws_db_instance.database.name}?stringtype=unspecified&sslmode=require"
+          GITLAB_ACCESS_TOKEN = var.gitlab_access_token
         }
       }
       image_identifier = "${var.ecr_image_url}:${var.image_tag}"

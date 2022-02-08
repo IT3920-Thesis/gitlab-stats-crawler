@@ -1,2 +1,10 @@
 # Health check endpoint (Should return HTTP 200)
 GET http://localhost:8080/health
+
+###
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits?all=true
+PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits/82fbcc6a86aa5b1e2cb69bc0e3aaeb3a64363cac/diff
+PRIVATE-TOKEN: {{gitlabAccessToken}}

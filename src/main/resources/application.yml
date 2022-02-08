@@ -10,6 +10,11 @@ micronaut:
       max-content-length: 104857600 # 100mb max content length
       read-timeout: 60s
 
+    services:
+      gitlabapi:
+        urls:
+          - "https://gitlab.stud.idi.ntnu.no"
+
   security:
     enabled: false
 
@@ -52,3 +57,11 @@ datasources:
     password: ${DATABASE_PASSWORD}
     url: ${DATABASE_URI}
 
+flyway:
+  datasources:
+    default:
+      # Disabled until we actually have any tables in resources/db/migration/
+      enabled: false
+
+gitlabapi:
+  accessToken: ${GITLAB_ACCESS_TOKEN}

@@ -48,4 +48,6 @@ module "crawler" {
 
   ecr_image_url = data.aws_ecr_repository.image.repository_url
   image_tag = local.last_commit_sha
+
+  gitlab_access_token = var.gitlab_access_token
 }

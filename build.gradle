@@ -18,6 +18,8 @@ dependencies {
     kapt("io.micronaut:micronaut-http-validation")
 
     implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut.reactor:micronaut-reactor")
+    implementation("io.micronaut.reactor:micronaut-reactor-http-client")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut.flyway:micronaut-flyway")
@@ -30,7 +32,7 @@ dependencies {
 
     // Logging
     runtimeOnly("ch.qos.logback:logback-classic")
-    implementation("net.logstash.logback:logstash-logback-encoder:6.6")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
 
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")
@@ -40,6 +42,8 @@ dependencies {
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    // Better assertion methods
+    testImplementation("io.strikt:strikt-core:$striktVersion")
 }
 
 

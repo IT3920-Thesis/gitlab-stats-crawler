@@ -15,6 +15,11 @@ variable "image_tag" {
   description = "The tag used to "
 }
 
+variable "gitlab_access_token" {
+  type = string
+  description = "Access token which grants API and read_repository access to repositories"
+}
+
 variable "tags" {
   type = map(string)
 }
