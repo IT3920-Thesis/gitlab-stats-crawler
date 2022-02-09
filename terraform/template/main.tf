@@ -10,6 +10,7 @@ resource "aws_db_instance" "database" {
   auto_minor_version_upgrade = true
   engine = "postgres"
   engine_version = "14.1"
+  publicly_accessible = true
   instance_class = "db.t4g.small"
   name = replace("${var.application_name}${var.environment}", "-", "")
   username = "gitlabcrawler"
