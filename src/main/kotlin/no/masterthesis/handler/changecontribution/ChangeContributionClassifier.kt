@@ -17,6 +17,7 @@ internal data class Contribution(
 internal object ChangeContributionClassifier {
   private val log = LoggerFactory.getLogger(this::class.java)
   private val javaScriptEndings = setOf("js", "ts", "jsx", "tsx", "mjs")
+  private val stylesheetEndings = setOf("less", "css", "sass", "scss")
 
   /**
    * Predicts which contributions have been included a specific commit.
@@ -54,7 +55,10 @@ internal object ChangeContributionClassifier {
     || filename.contains("__tests__")
     || filename.contains(".spec.")
     || filename.contains(".test.")
+    // Cypress tests are often located inside this folder
     || filename.startsWith("cypress/")
+    // This isn't really a test, but is highly related to the test setup
+    || filename.endsWith("jest.config.js")
 
   private fun isFunctionalCode(filename: String): Boolean {
     if (filename.startsWith("src/main/")) {
@@ -67,6 +71,18 @@ internal object ChangeContributionClassifier {
 
     if (isJavaScriptFile && !isTestCode(filename)) {
       log.trace("Predict that filename is JS functional", kv("filename", filename))
+      return true
+    }
+
+    val isHtmlTemplate = filename.endsWith(".html")
+    if (isHtmlTemplate) {
+      log.trace("Predict that filename is HTML", kv("filename", filename))
+      return true
+    }
+
+    val isStylesheetFile = stylesheetEndings.any { ending -> filename.endsWith(".$ending") }
+    if (isStylesheetFile) {
+      log.trace("Predict that filename is Stylesheet", kv("filename", filename))
       return true
     }
 
