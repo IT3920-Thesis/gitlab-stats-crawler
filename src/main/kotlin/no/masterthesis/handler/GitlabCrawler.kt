@@ -6,6 +6,7 @@ import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Scheduled
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import java.util.concurrent.TimeUnit
 import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.event.GitlabCommitEvent
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
@@ -31,6 +32,9 @@ internal class GitlabCrawler(
         repositoryId = projectId.toString(),
         commit = it,
       ))
+    }.map {
+      // Wait for all event listeners to complete
+      it.get(60, TimeUnit.SECONDS)
     }
   }
 }

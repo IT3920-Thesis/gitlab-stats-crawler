@@ -40,7 +40,11 @@ class GitlabCommitCrawler(
     val commits = client
       .findAllCommitsByProject(projectId).awaitSingle()
       .associateBy { it.id }
-    log.info("All commits have been extracted for project", kv("projectId", projectId), kv("commits", commits.values))
+    log.info("All commits have been extracted for project",
+      kv("projectId", projectId),
+      kv("commits", commits.values),
+      kv("numberOfCommits", commits.size),
+    )
 
     val commitDiffs = commits
       .mapValues {
@@ -52,6 +56,7 @@ class GitlabCommitCrawler(
 
     commitDiffs.map { (commitSha, diffs) ->
       val commitMetadata = commits.getValue(commitSha)
+      log.info("Commit has number of diffs", kv("commitSha", commitSha), kv("numberOfDiffs", diffs.size))
 
       GitCommit(
         id = commitSha,

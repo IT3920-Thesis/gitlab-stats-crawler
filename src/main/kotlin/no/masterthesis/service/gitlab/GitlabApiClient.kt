@@ -13,9 +13,11 @@ interface GitlabApiClient {
    * Retrieves the complete list of Git commits in the specified
    * Gitlab project.
    * @link https://docs.gitlab.com/ee/api/commits.html#list-repository-commits
+   *
+   * TODO(fredrfli) Implement pagination, since gitlab api returns max 100 items
    * */
   @Get(
-    uri = "/api/v4/projects/{projectId}/repository/commits?all=true",
+    uri = "/api/v4/projects/{projectId}/repository/commits?all=true&per_page=100",
     consumes = [MediaType.APPLICATION_JSON],
   )
   fun findAllCommitsByProject(projectId: Long): Publisher<List<GitlabGitCommit>>
@@ -25,7 +27,7 @@ interface GitlabApiClient {
    * @link https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
    * */
   @Get(
-    uri = "/api/v4/projects/{projectId}/repository/commits/{commitSha}/diff",
+    uri = "/api/v4/projects/{projectId}/repository/commits/{commitSha}/diff?per_page=100",
     consumes = [MediaType.APPLICATION_JSON],
   )
   fun findCommitDiffs(projectId: Long, commitSha: String): Publisher<List<GitlabGitCommitDiff>>

@@ -22,7 +22,11 @@ internal open class ChangeContributionListener(
   @EventListener
   @Async
   open fun onCommit(event: GitlabCommitEvent) {
-    log.info("Received new commit event", kv("event", event))
+    log.info("Received new commit event",
+      kv("groupId", event.groupId),
+      kv("repositoryId", event.repositoryId),
+      kv("commitSha", event.commit.id),
+    )
     val commit = event.commit
 
     val contributions = commit.diffs.flatMap {
@@ -32,7 +36,7 @@ internal open class ChangeContributionListener(
         commit = commit,
       )
     }
-    log.info("Extracted contributions", kv("contributions", contributions), kv("groupId", event.groupId), kv("repositoryId", event.repositoryId))
+    log.trace("Extracted contributions", kv("contributions", contributions), kv("groupId", event.groupId), kv("repositoryId", event.repositoryId))
     repository.saveAll(contributions)
   }
 
