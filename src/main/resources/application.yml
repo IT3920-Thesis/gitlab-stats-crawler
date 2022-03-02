@@ -62,7 +62,8 @@ flyway:
   datasources:
     default:
       # Disabled until we actually have any tables in resources/db/migration/
-      enabled: false
+      enabled: true
+      fail-on-missing-locations: true
 
 gitlabapi:
   accessToken: ${GITLAB_ACCESS_TOKEN}

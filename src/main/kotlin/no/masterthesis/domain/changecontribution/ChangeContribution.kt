@@ -15,6 +15,10 @@ data class ChangeContribution(
    * */
   val groupId: String,
   /**
+   * Denotes the URL-safe name of the repository. Should uniquelly identify the repository inside a group (or from the global level)
+   * */
+  val repositoryId: String,
+  /**
    * Key used determine who contributed to this change
    * */
   val authorEmail: String,
