@@ -15,7 +15,6 @@ internal class ChangeContributionListenerTest : TestContainersWrapper() {
   @Inject
   private lateinit var commitCrawler: GitlabCommitCrawler
 
-
   @Test
   fun `Classifies all contributions from a gitlab repository`() {
     val events = commitCrawler.findAllCommitsByProject(1021).takeLast(3)

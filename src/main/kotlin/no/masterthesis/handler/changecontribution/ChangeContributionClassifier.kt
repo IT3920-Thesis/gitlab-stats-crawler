@@ -40,7 +40,7 @@ internal object ChangeContributionClassifier {
       return ContributionType.FUNCTIONAL
     }
 
-    log.warn("Could not classify the contribution to any specific types", kv("diff", diff))
+    log.warn("Could not classify the contribution to any specific types", kv("aMode", diff.aMode), kv("bMode", diff.bMode))
     return ContributionType.OTHER
   }
 

@@ -20,9 +20,6 @@ internal class GitlabCommitCrawlerTest : TestContainersWrapper() {
 
     expectThat(commits).isNotEmpty()
 
-    println("\n\nCommit")
-    println(commits.find { it.id == "f5d3c45ceb0a8e0ed026f3c589b8a912c4d9ffee" })
-
     expectThat(commits).all {
       get { id }.isNotEmpty()
       get { title }.isNotEmpty()
