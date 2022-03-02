@@ -1,5 +1,7 @@
 package no.masterthesis.handler
 
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.runtime.event.ApplicationStartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
@@ -13,6 +15,7 @@ import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import org.slf4j.LoggerFactory
 
 @Singleton
+@Requires(notEnv = [Environment.TEST])
 internal class GitlabCrawler(
   @Inject private val crawler: GitlabCommitCrawler,
   @Inject private val publisher: ApplicationEventPublisher<GitlabCommitEvent>,
@@ -26,7 +29,7 @@ internal class GitlabCrawler(
     val commits = crawler.findAllCommitsByProject(projectId)
 
     commits.map {
-      log.info("Publishing event...", kv("commit", it))
+      log.info("Publishing event...", kv("commitSha", it.id))
       publisher.publishEventAsync(GitlabCommitEvent(
         groupId = groupId,
         repositoryId = projectId.toString(),

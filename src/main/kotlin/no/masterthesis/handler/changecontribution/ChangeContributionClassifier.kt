@@ -29,7 +29,7 @@ internal object ChangeContributionClassifier {
    * @return A list of predicted contributions to a specific file change
    * */
   fun predictContributionType(diff: GitlabGitCommitDiff): ContributionType {
-    log.info("Predicting contributions for diff...", kv("newFile", diff.newPath))
+    log.trace("Predicting contributions for diff...", kv("newFile", diff.newPath))
 
     if (isTestCode(diff.newPath)) {
       log.trace("File diff is classified as contribution to tests", kv("diff", diff))

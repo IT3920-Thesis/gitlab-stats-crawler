@@ -37,26 +37,27 @@ class GitlabCommitCrawler(
    * @return List of commits with associated differences
    * */
   fun findAllCommitsByProject(projectId: Long): List<GitCommit> = runBlocking {
-    val commits = client
-      .findAllCommitsByProject(projectId).awaitSingle()
-      .associateBy { it.id }
+    val commits = retrieveAllCommits(projectId)
     log.info("All commits have been extracted for project",
       kv("projectId", projectId),
-      kv("commits", commits.values),
       kv("numberOfCommits", commits.size),
     )
 
-    val commitDiffs = commits
-      .mapValues {
-        client.findCommitDiffs(
-          projectId = projectId,
-          commitSha = it.key,
-        ).awaitSingle()
-      }
+    log.info("Extracting file diffs from every commit", kv("numberOfCommits", commits.size))
+    // Retrieve all diffs in one go, so we can make use of concurrency
+    val commitDiffs = retrieveAllDiffs(
+      projectId = projectId,
+      commitSha = commits.keys
+    )
+    log.info(
+      "File diffs extracted",
+      kv("numberOfCommits", commits.size),
+      kv("numberOfDiffs", commitDiffs.values.sumOf { it.size }),
+    )
 
     commitDiffs.map { (commitSha, diffs) ->
       val commitMetadata = commits.getValue(commitSha)
-      log.info("Commit has number of diffs", kv("commitSha", commitSha), kv("numberOfDiffs", diffs.size))
+      log.trace("Commit has number of diffs", kv("commitSha", commitSha), kv("numberOfDiffs", diffs.size))
 
       GitCommit(
         id = commitSha,
@@ -70,5 +71,54 @@ class GitlabCommitCrawler(
         diffs = diffs,
       )
     }
+  }
+
+  private fun retrieveAllCommits(projectId: Long): Map<String, GitlabGitCommit> = runBlocking {
+    val allCommits = ArrayList<GitlabGitCommit>()
+    var currentPage = 1
+
+    while (true) {
+      log.trace("Requesting commit", kv("projectId", projectId), kv("page", currentPage))
+      val page = client.findAllCommitsByProject(projectId, page = currentPage).awaitSingle()
+      // Continue until gitlab has no more data to return
+      if (page.isEmpty()) {
+        break
+      }
+      allCommits.addAll(page)
+      currentPage += 1
+    }
+
+    allCommits.associateBy { it.id }
+  }
+
+  private fun retrieveAllDiffs(projectId: Long, commitSha: Set<String>): Map<String, List<GitlabGitCommitDiff>> {
+    val diffs = runBlocking {
+      commitSha.map { sha -> sha to retrieveAllDiffsForCommit(projectId, sha) }
+    }.associate { it.first to it.second }
+
+    return diffs
+  }
+
+  private suspend fun retrieveAllDiffsForCommit(projectId: Long, commitSha: String): List<GitlabGitCommitDiff> {
+    val allDiffs = ArrayList<GitlabGitCommitDiff>()
+    var currentPage = 1
+
+    while (true) {
+      log.trace("Requesting diff for commit", kv("projectId", projectId), kv("commitSha", commitSha), kv("page", currentPage))
+      val page = client.findCommitDiffs(
+        projectId = projectId,
+        commitSha = commitSha,
+        page = currentPage,
+      ).awaitSingle()
+
+      // Continue until gitlab has no more data to return
+      if (page.isEmpty()) {
+        break
+      }
+      allDiffs.addAll(page)
+      currentPage += 1
+    }
+
+    return allDiffs
   }
 }

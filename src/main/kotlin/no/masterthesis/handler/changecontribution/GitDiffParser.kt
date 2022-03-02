@@ -25,7 +25,7 @@ internal object GitDiffParser {
     val linesAdded = diffs.count { it.startsWith("+") }
     val linesRemoved = diffs.count { it.startsWith("-") }
 
-    log.info("Changes has been counted", kv("linesAdded", linesAdded), kv("linesRemoved", linesRemoved), kv("diffBMode", diff.bMode))
+    log.trace("Changes has been counted", kv("linesAdded", linesAdded), kv("linesRemoved", linesRemoved), kv("diffBMode", diff.bMode))
     return linesAdded to linesRemoved
   }
 }

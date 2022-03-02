@@ -5,9 +5,7 @@ import jakarta.inject.Inject
 import no.masterthesis.configuration.TestContainersWrapper
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.assertions.all
-import strikt.assertions.isNotEmpty
-import strikt.assertions.isNotNull
+import strikt.assertions.*
 
 @MicronautTest
 internal class GitlabCommitCrawlerTest : TestContainersWrapper() {
@@ -18,7 +16,9 @@ internal class GitlabCommitCrawlerTest : TestContainersWrapper() {
   fun `'findAllCommitsByProject' retrieves commit metadata and diffs`() {
     val commits = commitCrawler.findAllCommitsByProject(1021)
 
-    expectThat(commits).isNotEmpty()
+    expectThat(commits)
+      .isNotEmpty()
+      .get { size }.isEqualTo(300)
 
     expectThat(commits).all {
       get { id }.isNotEmpty()
