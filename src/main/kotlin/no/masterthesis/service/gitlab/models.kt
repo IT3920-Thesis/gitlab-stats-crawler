@@ -22,11 +22,11 @@ data class GitlabGitCommit(
   val title: String,
   val message: String?,
   val authorName: String,
-  val authorEmail: String?,
+  val authorEmail: String,
   // We might need to add some additional packages to Jackson
   val authoredDate: ZonedDateTime,
   val committerName: String?,
-  val committerEmail: String?,
+  val committerEmail: String,
   val committedDate: ZonedDateTime,
   val createdAt: ZonedDateTime,
   val parentIds: List<String>,

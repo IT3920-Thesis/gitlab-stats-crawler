@@ -4,7 +4,7 @@
         </encoder>
     </appender>
 
-    <logger name="io.micronaut.http.client" level="TRACE"/>
+    <logger name="io.micronaut.http.client" level="INFO"/>
     <logger name="no.masterthesis" level="TRACE"/>
 
     <root level="WARN">

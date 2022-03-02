@@ -2,6 +2,7 @@ package no.masterthesis.handler.changecontribution
 
 import java.time.ZonedDateTime
 import no.masterthesis.domain.changecontribution.ContributionType
+import no.masterthesis.handler.changecontribution.ChangeContributionClassifier.predictContributionType
 import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
 import org.junit.jupiter.api.Test
@@ -10,7 +11,6 @@ import strikt.assertions.all
 import strikt.assertions.isEqualTo
 
 internal class ChangeContributionClassifierTest {
-  private val contributionClassifier = ChangeContributionClassifier()
 
   @Test
   fun `'predictContributionTypes' predicts Java functional code`() {
@@ -28,10 +28,10 @@ internal class ChangeContributionClassifierTest {
     )
     )
 
-    val contributions = contributionClassifier.predictContributionTypes(commit)
+    val contributions = commit.diffs.map { predictContributionType(it) }
 
     expectThat(contributions).all {
-      get { type }.isEqualTo(ContributionType.FUNCTIONAL)
+      isEqualTo(ContributionType.FUNCTIONAL)
     }
   }
 
@@ -50,10 +50,10 @@ internal class ChangeContributionClassifierTest {
       )
     ))
 
-    val contributions = contributionClassifier.predictContributionTypes(commit)
+    val contributions = commit.diffs.map { predictContributionType(it) }
 
     expectThat(contributions).all {
-      get { type }.isEqualTo(ContributionType.FUNCTIONAL)
+      isEqualTo(ContributionType.TEST)
     }
   }
 

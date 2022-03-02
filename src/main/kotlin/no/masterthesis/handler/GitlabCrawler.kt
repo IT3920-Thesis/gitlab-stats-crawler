@@ -28,6 +28,7 @@ internal class GitlabCrawler(
       log.info("Publishing event...", kv("commit", it))
       publisher.publishEventAsync(GitlabCommitEvent(
         groupId = groupId,
+        repositoryId = projectId.toString(),
         commit = it,
       ))
     }

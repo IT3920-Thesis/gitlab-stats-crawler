@@ -8,5 +8,6 @@ import no.masterthesis.service.gitlab.GitCommit
  * */
 data class GitlabCommitEvent(
   val groupId: String,
+  val repositoryId: String,
   val commit: GitCommit,
 )

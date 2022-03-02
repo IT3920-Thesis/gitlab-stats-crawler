@@ -5,6 +5,8 @@ import jakarta.inject.Singleton
 import java.time.ZonedDateTime
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
+import net.logstash.logback.argument.StructuredArguments.kv
+import org.slf4j.LoggerFactory
 
 data class GitCommit(
   val id: String,
@@ -12,11 +14,11 @@ data class GitCommit(
   val title: String,
   val message: String?,
   val committer: Author,
-  val diffs: List<GitlabGitCommitDiff>
+  val diffs: List<GitlabGitCommitDiff>,
 ) {
   data class Author(
     val name: String?,
-    val email: String?,
+    val email: String,
   )
 }
 
@@ -27,6 +29,8 @@ data class GitCommit(
 class GitlabCommitCrawler(
   @Inject private val client: GitlabApiClient,
 ) {
+  private val log = LoggerFactory.getLogger(this::class.java)
+
   /**
    * Retrieves all commits for a project, and changes of each commit
    * @param projectId The numeric project id in Gitlab (make sure you have access to this project)
@@ -36,6 +40,7 @@ class GitlabCommitCrawler(
     val commits = client
       .findAllCommitsByProject(projectId).awaitSingle()
       .associateBy { it.id }
+    log.info("All commits have been extracted for project", kv("projectId", projectId), kv("commits", commits.values))
 
     val commitDiffs = commits
       .mapValues {
@@ -49,7 +54,7 @@ class GitlabCommitCrawler(
       val commitMetadata = commits.getValue(commitSha)
 
       GitCommit(
-        id =  commitSha,
+        id = commitSha,
         createdAt = commitMetadata.createdAt,
         title = commitMetadata.title,
         message = commitMetadata.message,

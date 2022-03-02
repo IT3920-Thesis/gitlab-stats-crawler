@@ -36,11 +36,11 @@ data class ChangeContribution(
    * The number of lines added for the specified commit and filePath.
    * It should adjust for renames/file moves.
    * */
-  val linesAdded: Long,
+  val linesAdded: Int,
   /**
    * Similar to [linesAdded] but for lines removed.
    * */
-  val linesRemoved: Long,
+  val linesRemoved: Int,
 
   /**
    * Flag used to tell what the previous filePath was,

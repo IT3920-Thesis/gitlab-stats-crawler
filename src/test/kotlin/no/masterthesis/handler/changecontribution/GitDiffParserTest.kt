@@ -1,24 +1,19 @@
 package no.masterthesis.handler.changecontribution
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
-import no.masterthesis.configuration.TestContainersWrapper
+import no.masterthesis.handler.changecontribution.GitDiffParser.countLinesChanged
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-@MicronautTest
-internal class GitDiffParserTest : TestContainersWrapper() {
-  @Inject
-  private lateinit var diffParser: GitDiffParser
-
+internal class GitDiffParserTest{
   @ParameterizedTest(name = "{0} should have {2} lines added and {3} lines removed")
   @MethodSource("provideGitDiff")
   fun `'countLinesAdded' correctly counts lines`(fileName: String, diff: String, expectedLinesAdded: Int, expectedLinesRemoved: Int) {
-    val (linesAdded, linesRemoved) = diffParser.countLinesChanged(GitlabGitCommitDiff(
+    val (linesAdded, linesRemoved) = countLinesChanged(GitlabGitCommitDiff(
       oldPath = fileName,
       newPath = fileName,
       aMode = "100644",
@@ -31,6 +26,27 @@ internal class GitDiffParserTest : TestContainersWrapper() {
 
     expectThat(linesAdded).isEqualTo(expectedLinesAdded)
     expectThat(linesRemoved).isEqualTo(expectedLinesRemoved)
+  }
+
+  /**
+   * Moved files in GitLab are flagged with isFileRenamed, where oldPath and newPath is different,
+   * whilst diff is only an empty string "".
+   * */
+  @Test
+  fun `'countLinesAdded' handles moved files`() {
+    val (linesAdded, linesRemoved) = countLinesChanged(GitlabGitCommitDiff(
+      oldPath = "cypress.json",
+      newPath = "models/cypress.json",
+      aMode = "100644",
+      bMode = "100644",
+      isFileRenamed = true,
+      isFileDeleted = false,
+      isNewFile = false,
+      diff = "",
+    ))
+
+    expectThat(linesAdded).isEqualTo(0)
+    expectThat(linesRemoved).isEqualTo(0)
   }
 
   companion object {

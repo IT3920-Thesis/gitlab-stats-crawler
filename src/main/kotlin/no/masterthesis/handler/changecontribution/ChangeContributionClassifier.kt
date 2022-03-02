@@ -14,11 +14,9 @@ internal data class Contribution(
 )
 
 @Singleton
-internal class ChangeContributionClassifier {
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
-    private val javaScriptEndings = setOf("js", "ts", "jsx", "tsx", "mjs")
-  }
+internal object ChangeContributionClassifier {
+  private val log = LoggerFactory.getLogger(this::class.java)
+  private val javaScriptEndings = setOf("js", "ts", "jsx", "tsx", "mjs")
 
   /**
    * Predicts which contributions have been included a specific commit.
@@ -27,33 +25,23 @@ internal class ChangeContributionClassifier {
    * We use the word "predict", because this classification requires some
    * degree of guesswork.
    *
-   * @return A list of predicted contributions to the [commit]
+   * @return A list of predicted contributions to a specific file change
    * */
-  fun predictContributionTypes(commit: GitCommit): List<Contribution> {
-    log.trace("Predicting contributions for commit...", kv("commit", commit))
-    val contributions = commit.diffs.flatMap { diff ->
-      listOf(
-        getTestContribution(diff),
-        getFunctionalCode(diff),
-      )
-    }.filterNotNull()
-    log.info("Contributions predicted", kv("commit", commit), kv("contributions", contributions))
+  fun predictContributionType(diff: GitlabGitCommitDiff): ContributionType {
+    log.trace("Predicting contributions for diff...", kv("diff", diff))
 
-    return contributions
-  }
-
-  private fun getTestContribution(diff: GitlabGitCommitDiff): Contribution? {
-    val newPath = diff.newPath
-
-    if (!isTestCode(newPath)) {
-      return null
+    if (isTestCode(diff.bMode)) {
+      log.trace("File diff is classified as contribution to tests", kv("diff", diff))
+      return ContributionType.TEST
     }
 
-    return Contribution(
-      type = ContributionType.TEST,
-      linesAdded = 15,
-      linesRemoved = 15,
-    )
+    if (isFunctionalCode(diff.bMode)) {
+      log.trace("File diff is classified as contribution to functional code", kv("diff", diff))
+      return ContributionType.FUNCTIONAL
+    }
+
+    log.warn("Could not classify the contribution to any specific types", kv("diff", diff))
+    return ContributionType.OTHER
   }
 
   private fun isTestCode(filename: String) = filename.startsWith("src/test/")
@@ -61,19 +49,6 @@ internal class ChangeContributionClassifier {
     || filename.contains("__tests__")
     || filename.contains(".spec.")
     || filename.contains(".test.")
-
-  private fun getFunctionalCode(diff: GitlabGitCommitDiff): Contribution? {
-    val filename = diff.newPath
-    if (!isFunctionalCode(filename)) {
-      return null
-    }
-
-    return Contribution(
-      type = ContributionType.FUNCTIONAL,
-      linesRemoved = 0,
-      linesAdded = 0,
-    )
-  }
 
   private fun isFunctionalCode(filename: String): Boolean {
     if (filename.startsWith("src/main/")) {
