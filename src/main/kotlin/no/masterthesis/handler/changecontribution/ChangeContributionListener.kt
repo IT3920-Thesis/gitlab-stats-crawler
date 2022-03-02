@@ -2,9 +2,11 @@ package no.masterthesis.handler.changecontribution
 
 import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Async
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.domain.changecontribution.ChangeContribution
+import no.masterthesis.domain.changecontribution.ChangeContributionRepository
 import no.masterthesis.event.GitlabCommitEvent
 import no.masterthesis.handler.changecontribution.ChangeContributionClassifier.predictContributionType
 import no.masterthesis.handler.changecontribution.GitDiffParser.countLinesChanged
@@ -12,7 +14,9 @@ import no.masterthesis.service.gitlab.GitCommit
 import org.slf4j.LoggerFactory
 
 @Singleton
-internal open class ChangeContributionListener {
+internal open class ChangeContributionListener(
+  @Inject private val repository: ChangeContributionRepository,
+) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   @EventListener
@@ -29,6 +33,7 @@ internal open class ChangeContributionListener {
       )
     }
     log.info("Extracted contributions", kv("contributions", contributions), kv("groupId", event.groupId), kv("repositoryId", event.repositoryId))
+    repository.saveAll(contributions)
   }
 
   private fun extractContributions(groupId: String, repositoryId: String, commit: GitCommit): List<ChangeContribution> {
