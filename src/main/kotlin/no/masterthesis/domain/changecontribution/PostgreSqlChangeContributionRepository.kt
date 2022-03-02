@@ -46,7 +46,7 @@ internal class PostgreSqlChangeContributionRepository(
       }
 
       val rowsChanged = batch.execute()
-      log.info("Successfully executed query", kv("rowsChanged", rowsChanged))
+      log.info("Successfully executed query", kv("rowsChanged", rowsChanged.size))
     }
   }
 }

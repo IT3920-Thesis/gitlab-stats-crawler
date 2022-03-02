@@ -28,19 +28,24 @@ internal object ChangeContributionClassifier {
    * @return A list of predicted contributions to a specific file change
    * */
   fun predictContributionType(diff: GitlabGitCommitDiff): ContributionType {
-    log.trace("Predicting contributions for diff...", kv("diff", diff))
+    log.info("Predicting contributions for diff...", kv("diff", diff))
 
-    if (isTestCode(diff.bMode)) {
+    if (isTestCode(diff.newPath)) {
       log.trace("File diff is classified as contribution to tests", kv("diff", diff))
       return ContributionType.TEST
     }
 
-    if (isFunctionalCode(diff.bMode)) {
+    if (isFunctionalCode(diff.newPath)) {
       log.trace("File diff is classified as contribution to functional code", kv("diff", diff))
       return ContributionType.FUNCTIONAL
     }
 
-    log.warn("Could not classify the contribution to any specific types", kv("aMode", diff.aMode), kv("bMode", diff.bMode))
+    if (isDocumentationFile(diff.newPath)) {
+      log.trace("File diff is classified as contribution to documentation", kv("diff", diff))
+      return ContributionType.DOCUMENTATION
+    }
+
+    log.warn("Could not classify the contribution to any specific types", kv("oldPath", diff.oldPath), kv("newPath", diff.newPath))
     return ContributionType.OTHER
   }
 
@@ -49,6 +54,7 @@ internal object ChangeContributionClassifier {
     || filename.contains("__tests__")
     || filename.contains(".spec.")
     || filename.contains(".test.")
+    || filename.startsWith("cypress/")
 
   private fun isFunctionalCode(filename: String): Boolean {
     if (filename.startsWith("src/main/")) {
@@ -64,6 +70,19 @@ internal object ChangeContributionClassifier {
       return true
     }
 
+    return false
+  }
+
+  private fun isDocumentationFile(fileName: String): Boolean {
+    // Should also catch the readme
+    if (fileName.endsWith(".md")) {
+      return true
+    }
+
+    // Assume that files inside docs are documentation code as well
+    if (fileName.startsWith("docs/") || fileName.startsWith("documentation/")) {
+      return true
+    }
     return false
   }
 }

@@ -59,7 +59,34 @@ internal class ChangeContributionClassifierTest {
 
   @Test
   fun `'predictContributionTypes' predicts JavaScript and TypeScript functional code`() {
+    val commit = generateCommit(listOf(
+      GitlabGitCommitDiff(
+        oldPath = "client/src/components/InformationSection/index.js",
+        newPath = "client/src/components/InformationSection/index.js",
+        aMode = "100644",
+        bMode = "100644",
+        isNewFile = false,
+        isFileRenamed = false,
+        isFileDeleted = false,
+        diff = "",
+      ),
+      GitlabGitCommitDiff(
+        oldPath = "routes/graphql/searchMedia.js",
+        newPath = "routes/graphql/searchMedia.js",
+        aMode = "100644",
+        bMode = "100644",
+        isNewFile = false,
+        isFileRenamed = false,
+        isFileDeleted = false,
+        diff = "",
+      ),
+    ))
 
+    val contributions = commit.diffs.map { predictContributionType(it) }
+
+    expectThat(contributions).all {
+      isEqualTo(ContributionType.FUNCTIONAL)
+    }
   }
 
   private fun generateCommit(diffs: List<GitlabGitCommitDiff>) = GitCommit(
