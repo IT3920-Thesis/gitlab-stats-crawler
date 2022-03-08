@@ -50,7 +50,7 @@ data class GitlabGitCommitDiff(
 
 @Introspected
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
-internal data class GitlabGroupDetails(
+data class GitlabGroupDetails(
   val id: Long,
   val name: String,
   val path: String,

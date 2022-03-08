@@ -7,18 +7,13 @@ import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
 import org.slf4j.LoggerFactory
 
-internal data class Contribution(
-  val linesAdded: Long,
-  val linesRemoved: Long,
-  val type: ContributionType,
-)
-
 @Singleton
 internal object ChangeContributionClassifier {
   private val log = LoggerFactory.getLogger(this::class.java)
   private val javaScriptEndings = setOf("js", "ts", "jsx", "tsx", "mjs")
   private val stylesheetEndings = setOf("less", "css", "sass", "scss")
   private val templateFiles = setOf("html", "twig")
+  private val generalConfigurationExtensions = setOf("conf", "toml", "tml", "env", "properties", "xml")
 
   /**
    * Predicts which contributions have been included a specific commit.
@@ -33,17 +28,24 @@ internal object ChangeContributionClassifier {
     log.trace("Predicting contributions for diff...", kv("newFile", diff.newPath))
 
     if (isTestCode(diff.newPath)) {
-      log.trace("File diff is classified as contribution to tests", kv("diff", diff))
+      log.trace("File diff is classified as contribution to tests", kv("newPath", diff.newPath))
       return ContributionType.TEST
     }
 
+    if (isConfigurationFile(diff.newPath)) {
+      log.trace("File diff is classified as contribution to configuration", kv("newPath", diff.newPath))
+      return ContributionType.CONFIGURATION
+    }
+
+    // This check has some broad checks, which is why it
+    // should be after configuration and test
     if (isFunctionalCode(diff.newPath)) {
-      log.trace("File diff is classified as contribution to functional code", kv("diff", diff))
+      log.trace("File diff is classified as contribution to functional code", kv("newPath", diff.newPath))
       return ContributionType.FUNCTIONAL
     }
 
     if (isDocumentationFile(diff.newPath)) {
-      log.trace("File diff is classified as contribution to documentation", kv("diff", diff))
+      log.trace("File diff is classified as contribution to documentation", kv("newPath", diff.newPath))
       return ContributionType.DOCUMENTATION
     }
 
@@ -87,6 +89,16 @@ internal object ChangeContributionClassifier {
       return true
     }
 
+    val isBashScript = filename.endsWith(".sh")
+    if (isBashScript) {
+      return true
+    }
+
+    val isSqlFile = filename.endsWith(".sql")
+    if (isSqlFile) {
+      return true
+    }
+
     return false
   }
 
@@ -102,4 +114,79 @@ internal object ChangeContributionClassifier {
     }
     return false
   }
+
+  private fun isConfigurationFile(fileName: String): Boolean {
+    if (isLinterConfig(fileName)) {
+      return true
+    }
+
+    // Some Dockerfiles are sometimes suffixed with an ending
+    // which is why we match using .contains
+    val isDockerFile = fileName.contains("Dockerfile")
+      || fileName.endsWith(".dockerignore")
+
+    if (isDockerFile) {
+      return true
+    }
+
+    val isEditorConfig = fileName.endsWith(".editorconfig")
+    if (isEditorConfig) {
+      return true
+    }
+
+    val isGitConfig = fileName.endsWith(".gitignore")
+      || fileName.endsWith(".gitattributes")
+      || fileName.endsWith(".gitmodules")
+
+    if (isGitConfig) {
+      return true
+    }
+
+    val isJavaBuildConfig = fileName.endsWith(".gradle", true)
+      // Normally used for kotlin configurations, instead of .gradle
+      || fileName.endsWith(".kts", true)
+      || fileName.endsWith("pom.xml", true)
+
+    if (isJavaBuildConfig) {
+      return true
+    }
+
+    val isGeneralConfigurationExtension = generalConfigurationExtensions.any { extension ->
+      fileName.endsWith(".$extension")
+    }
+
+    // Generic configuration file
+    if (isJsonFile(fileName) || isYamlFile(fileName) || isGeneralConfigurationExtension) {
+      return true
+    }
+
+    return false
+  }
+
+  private fun isLinterConfig(fileName: String): Boolean {
+    // The eslint config file can have many suffixes
+    // See https://eslint.org/docs/user-guide/configuring/configuration-files
+    val isEsLint = fileName.contains(".eslintrc", true)
+      || fileName.endsWith(".eslintignore", true)
+
+    if (isEsLint) {
+      return true
+    }
+
+    val isPrettierConfig = fileName.contains(".prettierrc", true)
+      || fileName.contains("prettier.config")
+
+    if (isPrettierConfig) {
+      return true
+    }
+
+    return false
+  }
+
+  private fun isJsonFile(fileName: String) = fileName.endsWith(".json")
+    || fileName.endsWith(".json5") // JSON file using the JSON5 spec
+    || fileName.endsWith(".ndjson") // JSON where each item is a newline
+
+  private fun isYamlFile(fileName: String) = fileName.endsWith(".yml", true)
+    || fileName.endsWith(".yaml", true)
 }

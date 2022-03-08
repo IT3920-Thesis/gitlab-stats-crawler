@@ -6,6 +6,8 @@ import no.masterthesis.handler.changecontribution.ChangeContributionClassifier.p
 import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import strikt.api.expectThat
 import strikt.assertions.all
 import strikt.assertions.isEqualTo
@@ -67,16 +69,75 @@ internal class ChangeContributionClassifierTest {
     }
   }
 
-  @Test
-  fun `'predictContributionTypes' predicts HTML files as functional code`() {
+  @ParameterizedTest
+  @ValueSource(strings = [
+    "client/public/index.html",
+    "server/template/main.twig",
+  ])
+  fun `'predictContributionTypes' predicts HTML files as functional code`(fileName: String) {
     val commit = generateCommit(listOf(
-      generateSimpleDiff("client/public/index.html"),
+      generateSimpleDiff(fileName),
     ))
 
     val contributions = commit.diffs.map { predictContributionType(it) }
 
     expectThat(contributions).all {
       isEqualTo(ContributionType.FUNCTIONAL)
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = [
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.json",
+    ".eslintignore",
+    ".prettierrc",
+    ".prettierrc.js",
+    "prettier.config.js",
+    "src/main/resources/something_checkstyle.xml",
+  ])
+  fun `'predictContributionTypes' predicts linter configs as Configuration`(fileName: String) {
+    val commit = generateCommit(listOf(
+      generateSimpleDiff(fileName),
+    ))
+
+    val contributions = commit.diffs.map { predictContributionType(it) }
+
+    expectThat(contributions).all {
+      isEqualTo(ContributionType.CONFIGURATION)
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = [
+    ".gitignore",
+    ".editorconfig",
+    ".dockerignore",
+    "compose.yml",
+    "docker-compose.yml",
+    "Dockerfile",
+    "Dockerfile.dev",
+    "build.gradle",
+    "settings.gradle",
+    "build.gradle.kts",
+    "pom.xml",
+    "secrets.env",
+    "nginx.conf",
+    "src/main/resources/application.properties",
+    "random_xml_file.xml",
+    "package.json",
+    "package-lock.json",
+  ])
+  fun `'predictContributionTypes' predicts typical config files as Configuration`(fileName: String) {
+    val commit = generateCommit(listOf(
+      generateSimpleDiff(fileName),
+    ))
+
+    val contributions = commit.diffs.map { predictContributionType(it) }
+
+    expectThat(contributions).all {
+      isEqualTo(ContributionType.CONFIGURATION)
     }
   }
 

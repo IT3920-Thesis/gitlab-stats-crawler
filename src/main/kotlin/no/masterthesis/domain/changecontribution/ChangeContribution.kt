@@ -3,9 +3,28 @@ package no.masterthesis.domain.changecontribution
 import java.time.ZonedDateTime
 
 enum class ContributionType {
+  /**
+   * Code that provides business value
+   * */
   FUNCTIONAL,
+  /**
+   * Code related to testing
+   * */
   TEST,
+  /**
+   * Files that are known to cover documentation,
+   * such as Markdown files
+   * */
   DOCUMENTATION,
+  /**
+   * Fairly broad category. It covers files that are assumed
+   * to be used to configure the project.
+   * This could be for infrastructure (Dockerfile, nginx.conf) or general project config (pom.xml, .eslintrc, *.yml).
+   * */
+  CONFIGURATION,
+  /**
+   * Dumping ground for everything else that we couldn't classify.
+   * */
   OTHER,
 }
 
