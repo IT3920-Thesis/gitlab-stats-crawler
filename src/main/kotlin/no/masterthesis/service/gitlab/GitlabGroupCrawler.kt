@@ -18,6 +18,11 @@ class GitlabGroupCrawler(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
+  /**
+   * Crawls the group for subgroups and their internal projects.
+   * It only goes one level deep. Therefore, project inside a subgroup's subgroup
+   * is not found
+   * */
   suspend fun crawlGitlabGroup(groupPath: String): List<GitlabAggregatedGroup> {
     val subgroups = client.listSubGroups(groupPath).awaitSingle()
     log.trace("Found subgroups", kv("subGroups", subgroups))

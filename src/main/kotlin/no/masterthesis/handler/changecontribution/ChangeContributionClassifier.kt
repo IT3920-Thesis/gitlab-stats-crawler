@@ -18,6 +18,7 @@ internal object ChangeContributionClassifier {
   private val log = LoggerFactory.getLogger(this::class.java)
   private val javaScriptEndings = setOf("js", "ts", "jsx", "tsx", "mjs")
   private val stylesheetEndings = setOf("less", "css", "sass", "scss")
+  private val templateFiles = setOf("html", "twig")
 
   /**
    * Predicts which contributions have been included a specific commit.
@@ -74,9 +75,9 @@ internal object ChangeContributionClassifier {
       return true
     }
 
-    val isHtmlTemplate = filename.endsWith(".html")
-    if (isHtmlTemplate) {
-      log.trace("Predict that filename is HTML", kv("filename", filename))
+    val isTemplateFile = templateFiles.any { ending -> filename.endsWith(".$ending") }
+    if (isTemplateFile) {
+      log.trace("Predict that filename is a template file, functional code", kv("filename", filename))
       return true
     }
 
