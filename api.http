@@ -2,9 +2,24 @@
 GET http://localhost:8080/health
 
 ###
-GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits?all=true
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits?all=true&per_page=2000
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
-GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits/82fbcc6a86aa5b1e2cb69bc0e3aaeb3a64363cac/diff
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits/1cbef1813a76cfd315f61fc87e99d3484737c665/diff
+PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+# Get group details
+GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it3920-gitlab-projects-examples
+PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+# List subgroups
+GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it3920-gitlab-projects-examples/subgroups
+PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+# List projects in group
+GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it3920-gitlab-projects-examples%2Fgroup2022001/projects/
 PRIVATE-TOKEN: {{gitlabAccessToken}}

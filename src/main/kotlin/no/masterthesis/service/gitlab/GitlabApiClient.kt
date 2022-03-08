@@ -32,4 +32,31 @@ interface GitlabApiClient {
     consumes = [MediaType.APPLICATION_JSON],
   )
   fun findCommitDiffs(projectId: Long, commitSha: String, page: Int = 1): Publisher<List<GitlabGitCommitDiff>>
+
+  /**
+   * Retrieves a list of changes to a specific commit
+   * @link https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
+   * */
+  @Get(
+    uri = "/api/v4/groups/{groupId}/?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun findGroupDetails(groupId: String, page: Int = 1): Publisher<GitlabGroupDetails>
+
+  @Get(
+    uri = "/api/v4/groups/{groupId}/subgroups/?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listSubGroups(groupId: String, page: Int = 1): Publisher<List<GitlabGroupDetails>>
+
+  /**
+   * Retrieves a list of changes to a specific commit
+   * @link https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
+   * */
+  @Get(
+    uri = "/api/v4/groups/{groupId}/projects/?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listProjectsInGroup(groupId: String, page: Int = 1): Publisher<List<GitlabProject>>
+
 }

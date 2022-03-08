@@ -47,3 +47,30 @@ data class GitlabGitCommitDiff(
   val isFileDeleted: Boolean,
   val diff: String,
 )
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+internal data class GitlabGroupDetails(
+  val id: Long,
+  val name: String,
+  val path: String,
+  val description: String,
+  val fullName: String,
+  val fullPath: String,
+  val webUrl: String,
+)
+
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabProject(
+  val id: Long,
+  val name: String,
+  val defaultBranch: String,
+  @JsonProperty("archived")
+  val isArchived: Boolean,
+  val path: String,
+  val pathWithNamespace: String,
+  val description: String?,
+  val webUrl: String,
+)
