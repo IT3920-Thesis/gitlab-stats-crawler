@@ -25,7 +25,11 @@ internal class GitlabCrawler(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  @Scheduled(fixedDelay = "1h", initialDelay = "1m")
+  /**
+   * Regular job that re-syncs with Gitlab every 24 hours,
+   * and once on deployment
+   * */
+  @Scheduled(fixedDelay = "24h", initialDelay = "1m")
   fun crawlGitlabProjects() {
     val startTime = System.currentTimeMillis()
     // This base group represents the course
