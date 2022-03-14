@@ -86,3 +86,36 @@ resource "aws_apprunner_service" "application" {
 
   tags = var.tags
 }
+
+resource "aws_secretsmanager_secret" "database_uri" {
+  name = "${var.application_name}-${var.environment}/database_uri"
+  recovery_window_in_days = 0
+  force_overwrite_replica_secret = true
+  tags = var.tags
+}
+resource "aws_secretsmanager_secret_version" "database_uri" {
+  secret_id = aws_secretsmanager_secret.database_uri.id
+  secret_string = local.database_uri
+}
+
+resource "aws_secretsmanager_secret" "database_user" {
+  name = "${var.application_name}-${var.environment}/database_user"
+  recovery_window_in_days = 0
+  force_overwrite_replica_secret = true
+  tags = var.tags
+}
+resource "aws_secretsmanager_secret_version" "database_user" {
+  secret_id = aws_secretsmanager_secret.database_user.id
+  secret_string = aws_db_instance.database.username
+}
+
+resource "aws_secretsmanager_secret" "database_password" {
+  name = "${var.application_name}-${var.environment}/database_password"
+  recovery_window_in_days = 0
+  force_overwrite_replica_secret = true
+  tags = var.tags
+}
+resource "aws_secretsmanager_secret_version" "database_password" {
+  secret_id = aws_secretsmanager_secret.database_password.id
+  secret_string = random_password.database_password.result
+}
