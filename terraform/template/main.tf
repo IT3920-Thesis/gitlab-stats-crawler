@@ -43,6 +43,12 @@ resource "aws_iam_role_policy_attachment" "application_image_builder" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess"
 }
 
+locals {
+  // We require SSL but aren't currently validating the actual certificate
+  // (We need to provide the certificate if we want to validate it)
+  database_uri = "jdbc:postgresql://${aws_db_instance.database.endpoint}/${aws_db_instance.database.name}?stringtype=unspecified&sslmode=require"
+}
+
 resource "aws_apprunner_service" "application" {
   service_name = "${var.application_name}-${var.environment}"
 
@@ -65,9 +71,7 @@ resource "aws_apprunner_service" "application" {
         runtime_environment_variables = {
           DATABASE_USER = aws_db_instance.database.username
           DATABASE_PASSWORD = random_password.database_password.result
-          // We require SSL but aren't currently validating the actual certificate
-          // (We need to provide the certificate if we want to validate it)
-          DATABASE_URI = "jdbc:postgresql://${aws_db_instance.database.endpoint}/${aws_db_instance.database.name}?stringtype=unspecified&sslmode=require"
+          DATABASE_URI = local.database_uri
           GITLAB_ACCESS_TOKEN = var.gitlab_access_token
         }
       }
