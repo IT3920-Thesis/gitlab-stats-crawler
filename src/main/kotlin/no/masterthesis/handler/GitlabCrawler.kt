@@ -25,8 +25,8 @@ internal class GitlabCrawler(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  @EventListener
-  fun crawlGitlabProjects(event: ApplicationStartupEvent) {
+  @Scheduled(fixedDelay = "1h", initialDelay = "1m")
+  fun crawlGitlabProjects() {
     val startTime = System.currentTimeMillis()
     // This base group represents the course
     val groupId = "it3920-gitlab-projects-examples"
@@ -34,7 +34,7 @@ internal class GitlabCrawler(
     val groups = runBlocking { groupCrawler.crawlGitlabGroup(groupId) }
 
     val commitsInProjects = groups.flatMap { subGroup ->
-      log.trace("Crawling projects in sub-group", kv("subGroup", subGroup))
+      log.info("Crawling projects in sub-group", kv("subGroup", subGroup))
       subGroup.projects.map { project ->
         val commits = commitCrawler.findAllCommitsByProject(project.id)
         Triple(subGroup, project, commits)
@@ -53,7 +53,7 @@ internal class GitlabCrawler(
     }
 
     gitlabCommitEvents.map { event ->
-      log.info(
+      log.trace(
         "Publishing event...",
         kv("commitSha", event.commit.id),
         kv("subGroupId", event.groupId),
