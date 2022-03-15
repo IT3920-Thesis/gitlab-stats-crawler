@@ -53,7 +53,7 @@ complexity:
     includeStaticDeclarations: false
   ComplexMethod:
     active: true
-    threshold: 10
+    threshold: 15
     ignoreSingleWhenExpression: false
   LabeledExpression:
     active: false
@@ -281,7 +281,8 @@ naming:
     forbiddenName: []
   FunctionMaxLength:
     active: true
-    maximumFunctionNameLength: 64
+    maximumFunctionNameLength: 150
+    excludes: ['**/test/**', '**/*Test.kt']
   FunctionMinLength:
     active: true
     minimumFunctionNameLength: 3
@@ -422,6 +423,8 @@ style:
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: true
+    # We allow tests to have longer lines
+    excludes: ['**/test/**', '**/*Test.kt']
   MayBeConst:
     active: true
   ModifierOrder:
@@ -446,7 +449,8 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 4
+    # Default was 4, but sometimes we do actually need more
+    max: 6
     excludedFunctions: "equals"
   SafeCast:
     active: true
@@ -486,5 +490,6 @@ style:
   WildcardImport:
     active: true
     excludeImports:
+      - 'strikt.assertions.*'
       - 'java.util.*'
       - 'kotlinx.android.synthetic.*'

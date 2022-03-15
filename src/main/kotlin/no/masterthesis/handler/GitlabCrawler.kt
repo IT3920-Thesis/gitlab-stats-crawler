@@ -66,6 +66,7 @@ internal class GitlabCrawler(
       publisher.publishEventAsync(event)
     }.map {
       // Wait for all event listeners to complete
+      @Suppress("MagicNumber")
       it.get(60, TimeUnit.SECONDS)
     }
 

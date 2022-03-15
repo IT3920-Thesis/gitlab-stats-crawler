@@ -108,7 +108,7 @@ workflows:
             - quality
           filters:
             branches:
-              only: master
+              only: main
       - plan-staging:
           filters:
             branches:
