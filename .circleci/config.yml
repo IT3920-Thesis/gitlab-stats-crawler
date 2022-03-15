@@ -1,6 +1,23 @@
 version: 2.1
 
 jobs:
+  quality:
+    docker:
+      - image: gradle:7.3.3-jdk17
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
+            - v1-dependencies-
+      - run:
+          name: Detekt
+          command: gradle detekt --info
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum "gradle.properties" }}
   push-docker-image:
     machine: true
     steps:
@@ -85,16 +102,20 @@ jobs:
 workflows:
   main:
     jobs:
-      - push-docker-image
-#          filters:
-#            branches:
-#              only: master
+      - quality
+      - push-docker-image:
+          requires:
+            - quality
+          filters:
+            branches:
+              only: master
       - plan-staging:
           filters:
             branches:
               only: main
       - apply-staging:
           requires:
+            - quality
             - plan-staging
             - push-docker-image
           filters:
