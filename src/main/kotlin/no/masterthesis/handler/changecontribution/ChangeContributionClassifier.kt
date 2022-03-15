@@ -27,30 +27,18 @@ internal object ChangeContributionClassifier {
   fun predictContributionType(diff: GitlabGitCommitDiff): ContributionType {
     log.trace("Predicting contributions for diff...", kv("newFile", diff.newPath))
 
-    if (isTestCode(diff.newPath)) {
-      log.trace("File diff is classified as contribution to tests", kv("newPath", diff.newPath))
-      return ContributionType.TEST
+    val contributionType = when {
+      isTestCode(diff.newPath) -> ContributionType.TEST
+      isConfigurationFile(diff.newPath) -> ContributionType.CONFIGURATION
+      // This check has some broad checks, which is why it
+      // should be after configuration and test
+      isFunctionalCode(diff.newPath) -> ContributionType.FUNCTIONAL
+      isDocumentationFile(diff.newPath) -> ContributionType.DOCUMENTATION
+      else -> ContributionType.OTHER
     }
+    log.trace("File diff is classified", kv("newPath", diff.newPath), kv("contributionType", contributionType))
 
-    if (isConfigurationFile(diff.newPath)) {
-      log.trace("File diff is classified as contribution to configuration", kv("newPath", diff.newPath))
-      return ContributionType.CONFIGURATION
-    }
-
-    // This check has some broad checks, which is why it
-    // should be after configuration and test
-    if (isFunctionalCode(diff.newPath)) {
-      log.trace("File diff is classified as contribution to functional code", kv("newPath", diff.newPath))
-      return ContributionType.FUNCTIONAL
-    }
-
-    if (isDocumentationFile(diff.newPath)) {
-      log.trace("File diff is classified as contribution to documentation", kv("newPath", diff.newPath))
-      return ContributionType.DOCUMENTATION
-    }
-
-    log.warn("Could not classify the contribution to any specific types", kv("oldPath", diff.oldPath), kv("newPath", diff.newPath))
-    return ContributionType.OTHER
+    return contributionType
   }
 
   private fun isTestCode(filename: String) = filename.startsWith("src/test/")
@@ -63,6 +51,7 @@ internal object ChangeContributionClassifier {
     // This isn't really a test, but is highly related to the test setup
     || filename.endsWith("jest.config.js")
 
+  @Suppress("ReturnCount")
   private fun isFunctionalCode(filename: String): Boolean {
     if (filename.startsWith("src/main/")) {
       log.trace("Predict that filename is Java Functional", kv("filename", filename))
@@ -115,6 +104,7 @@ internal object ChangeContributionClassifier {
     return false
   }
 
+  @Suppress("ReturnCount")
   private fun isConfigurationFile(fileName: String): Boolean {
     if (isLinterConfig(fileName)) {
       return true
