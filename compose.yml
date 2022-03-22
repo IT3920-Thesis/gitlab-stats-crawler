@@ -28,12 +28,6 @@ services:
       DATABASE_USER: gitlabstats
       DATABASE_PASSWORD: somepassword
       DATABASE_URI: jdbc:postgresql://db:5432/gitlabstats?stringtype=unspecified
-  grafana:
-    image: grafana/grafana:8.2.6
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
 
 volumes:
   grafana-storage:
