@@ -23,3 +23,11 @@ PRIVATE-TOKEN: {{gitlabAccessToken}}
 # List projects in group
 GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it3920-gitlab-projects-examples%2Fgroup2022001/projects/
 PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/merge_requests/?per_page=2000
+PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/issues/4
+PRIVATE-TOKEN: {{gitlabAccessToken}}
