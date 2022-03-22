@@ -11,6 +11,7 @@ open class GitlabFileCrawler(
   private val client: GitlabApiClient,
 ) {
 
+  @Cacheable("mailmap", parameters = ["projectId"])
   open fun retrieveMailMap(projectId: String, ref: String = "master"): Map<String, Set<String>> {
     val mailMap = Mono.from(
       client.retrieveFileFromRepository(projectId.base64UrlEncode(), filePath  = ".mailmap", ref = ref)
