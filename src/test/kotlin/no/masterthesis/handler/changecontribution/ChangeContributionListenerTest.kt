@@ -17,12 +17,14 @@ internal class ChangeContributionListenerTest : TestContainersWrapper() {
 
   @Test
   fun `Classifies all contributions from a gitlab repository`() {
-    val events = commitCrawler.findAllCommitsByProject(1021).takeLast(3)
+    val events = commitCrawler.findAllCommitsByProject(15463).takeLast(3)
 
     events.forEach {
       changeContributionListener.onCommit(GitlabCommitEvent(
-        groupId = "prosjekt4",
-        repositoryId = "gruppe20",
+        rootGroupId = "it3920-gitlab-projects-examples",
+        groupId = "group2022001",
+        repositoryPath = "randominternalproject002",
+        projectId = 15463,
         commit = it,
       ))
     }

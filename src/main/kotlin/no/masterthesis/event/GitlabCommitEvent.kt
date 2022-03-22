@@ -7,7 +7,9 @@ import no.masterthesis.service.gitlab.GitCommit
  * which can be listened to with [io.micronaut.runtime.event.annotation.EventListener]
  * */
 data class GitlabCommitEvent(
+  val rootGroupId: String,
   val groupId: String,
-  val repositoryId: String,
+  val repositoryPath: String,
+  val projectId: Long,
   val commit: GitCommit,
 )

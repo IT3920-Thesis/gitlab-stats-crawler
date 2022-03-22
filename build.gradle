@@ -30,6 +30,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
 
+    // Caching
+    implementation("io.micronaut.cache:micronaut-cache-core")
+    implementation("io.micronaut.cache:micronaut-cache-caffeine")
+
     // Logging
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")

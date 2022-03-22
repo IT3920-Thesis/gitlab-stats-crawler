@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.micronaut.core.annotation.Introspected
 import java.time.ZonedDateTime
+import java.util.Base64
 
 /**
  * This file contains a mapping of Gitlab's API response structures,
@@ -74,3 +75,22 @@ data class GitlabProject(
   val description: String?,
   val webUrl: String,
 )
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabFile(
+  val fileName: String,
+  val filePath: String,
+  val size: Long,
+  val encoding: String,
+  val ref: String,
+  val commitId: String,
+  val lastCommitId: String,
+  val content: String,
+) {
+  companion object {
+    private val base64Decoder = Base64.getDecoder()
+  }
+
+  val contentBase64Decoded by lazy { String(base64Decoder.decode(content)) }
+}

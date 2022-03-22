@@ -49,8 +49,10 @@ internal class GitlabCrawler(
     val gitlabCommitEvents = commitsInProjects.flatMap { (subGroup, project, commits) ->
       commits.map { commit ->
         GitlabCommitEvent(
+          rootGroupId = groupId,
           groupId = subGroup.groupId,
-          repositoryId = project.path,
+          repositoryPath = project.path,
+          projectId = project.id,
           commit = commit,
         )
       }
@@ -61,7 +63,7 @@ internal class GitlabCrawler(
         "Publishing event...",
         kv("commitSha", event.commit.id),
         kv("subGroupId", event.groupId),
-        kv("projectPath", event.repositoryId),
+        kv("projectPath", event.repositoryPath),
       )
       publisher.publishEventAsync(event)
     }.map {

@@ -59,4 +59,16 @@ interface GitlabApiClient {
   )
   fun listProjectsInGroup(groupId: String, page: Int = 1): Publisher<List<GitlabProject>>
 
+  /**
+   * Retrieves a specific file on gitlab, based on the specific files
+   * */
+  @Get(
+    uri = "/api/v4/projects/{projectId}/repository/files/{filePath}?ref={ref}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun retrieveFileFromRepository(
+    projectId: String,
+    filePath: String,
+    ref: String = "master",
+  ): Publisher<GitlabFile>
 }
