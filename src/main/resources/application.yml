@@ -5,6 +5,10 @@ micronaut:
     port: 8080
     cors: false
 
+  caches:
+    mailmap:
+      maximum-size: 1000
+
   http:
     client:
       max-content-length: 104857600 # 100mb max content length
@@ -15,6 +19,11 @@ micronaut:
         urls:
           - "https://gitlab.stud.idi.ntnu.no"
         exception-on-error-status: true
+        # NTNU has screwed up their certificate...
+        # Trust it until Java can naturally validate the complete certificate chain
+        ssl:
+          insecure-trust-all-certificates: true
+          enabled: true
 
   security:
     enabled: false
