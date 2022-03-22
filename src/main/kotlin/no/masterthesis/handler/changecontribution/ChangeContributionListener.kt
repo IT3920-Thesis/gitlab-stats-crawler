@@ -43,15 +43,15 @@ internal open class ChangeContributionListener(
         )
       }
       .map {
-        overrideCommitEmails(it, projectId = event.projectId.toString())
+        overrideCommitEmails(it, projectId = event.projectId.toString(), branch = event.defaultBranch)
       }
 
     log.trace("Extracted contributions", kv("contributions", contributions), kv("groupId", event.groupId), kv("repositoryId", event.repositoryPath))
     repository.saveAll(contributions)
   }
 
-  private fun overrideCommitEmails(contribution: ChangeContribution, projectId: String): ChangeContribution {
-    val mailMap = fileCrawler.retrieveMailMap(projectId, "master")
+  private fun overrideCommitEmails(contribution: ChangeContribution, projectId: String, branch: String): ChangeContribution {
+    val mailMap = fileCrawler.retrieveMailMap(projectId, branch)
     val emailLookup = mailMap
       // Invert the mailmap so we can match on commit email
       .flatMap { (key, values) -> values.map { it to key } }

@@ -53,6 +53,7 @@ internal class GitlabCrawler(
           groupId = subGroup.groupId,
           repositoryPath = project.path,
           projectId = project.id,
+          defaultBranch = project.defaultBranch,
           commit = commit,
         )
       }

@@ -25,6 +25,7 @@ internal class ChangeContributionListenerTest : TestContainersWrapper() {
         groupId = "group2022001",
         repositoryPath = "randominternalproject002",
         projectId = 15463,
+        defaultBranch = "master",
         commit = it,
       ))
     }

@@ -11,5 +11,6 @@ data class GitlabCommitEvent(
   val groupId: String,
   val repositoryPath: String,
   val projectId: Long,
+  val defaultBranch: String = "master",
   val commit: GitCommit,
 )
