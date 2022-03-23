@@ -3,8 +3,6 @@ package no.masterthesis.handler
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import io.micronaut.context.event.ApplicationEventPublisher
-import io.micronaut.runtime.event.ApplicationStartupEvent
-import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Scheduled
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
