@@ -24,6 +24,10 @@ micronaut:
         ssl:
           insecure-trust-all-certificates: true
           enabled: true
+        pool:
+          enabled: true
+          acquire-timeout: '1s'
+          max-connections: 50
 
   security:
     enabled: false

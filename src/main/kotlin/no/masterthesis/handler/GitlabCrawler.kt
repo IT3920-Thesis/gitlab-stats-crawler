@@ -3,13 +3,16 @@ package no.masterthesis.handler
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment
 import io.micronaut.context.event.ApplicationEventPublisher
-import io.micronaut.scheduling.annotation.Scheduled
+import io.micronaut.discovery.event.ServiceReadyEvent
+import io.micronaut.runtime.event.annotation.EventListener
+import io.micronaut.scheduling.annotation.Async
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.event.GitlabCommitEvent
+import no.masterthesis.service.gitlab.GitlabAggregatedGroup
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import no.masterthesis.service.gitlab.GitlabGroupCrawler
 import org.slf4j.LoggerFactory
@@ -27,14 +30,24 @@ internal class GitlabCrawler(
    * Regular job that re-syncs with Gitlab every 24 hours,
    * and once on deployment
    * */
-  @Scheduled(fixedDelay = "24h", initialDelay = "1m")
-  fun crawlGitlabProjects() {
+  @EventListener
+  @Async
+  fun crawlGitlab(event: ServiceReadyEvent) {
+    log.info("Application has started. Crawling for gitlab metadata...")
     val startTime = System.currentTimeMillis()
     // This base group represents the course
     val groupId = "it3920-gitlab-projects-examples"
     // These subgroups represent the group a team is member of
     val groups = runBlocking { groupCrawler.crawlGitlabGroup(groupId) }
 
+    extractDiffsInGroups(groupId, groups)
+
+    val endTime = System.currentTimeMillis()
+    val timeTakenSeconds = (endTime - startTime) / 1000
+    log.info("Crawling completed", kv("timeTakenSeconds", timeTakenSeconds))
+  }
+
+  private fun extractDiffsInGroups(rootGroupId: String, groups: List<GitlabAggregatedGroup>) {
     val commitsInProjects = groups.flatMap { subGroup ->
       log.info("Crawling projects in sub-group", kv("subGroup", subGroup))
       subGroup.projects.map { project ->
@@ -47,7 +60,7 @@ internal class GitlabCrawler(
     val gitlabCommitEvents = commitsInProjects.flatMap { (subGroup, project, commits) ->
       commits.map { commit ->
         GitlabCommitEvent(
-          rootGroupId = groupId,
+          rootGroupId = rootGroupId,
           groupId = subGroup.groupId,
           repositoryPath = project.path,
           projectId = project.id,
@@ -71,8 +84,5 @@ internal class GitlabCrawler(
       it.get(60, TimeUnit.SECONDS)
     }
 
-    val endTime = System.currentTimeMillis()
-    val timeTakenSeconds = (endTime - startTime) / 1000
-    log.info("Crawling completed", kv("timeTakenSeconds", timeTakenSeconds))
   }
 }
