@@ -3,7 +3,7 @@ package no.masterthesis.service.gitlab
 import io.micronaut.cache.annotation.Cacheable
 import jakarta.inject.Singleton
 import no.masterthesis.util.MailMapParser
-import no.masterthesis.util.base64UrlEncode
+import no.masterthesis.util.encodeUriComponent
 import reactor.core.publisher.Mono
 
 @Singleton
@@ -14,7 +14,7 @@ open class GitlabFileCrawler(
   @Cacheable("mailmap", parameters = ["projectId"])
   open fun retrieveMailMap(projectId: String, ref: String = "master"): Map<String, Set<String>> {
     val mailMap = Mono.from(
-      client.retrieveFileFromRepository(projectId.base64UrlEncode(), filePath  = ".mailmap", ref = ref)
+      client.retrieveFileFromRepository(projectId.encodeUriComponent(), filePath  = ".mailmap", ref = ref)
     ).block()
 
     return mailMap

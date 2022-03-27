@@ -22,12 +22,21 @@ services:
       - .:/app/
     depends_on:
       - db
+      - rabbitmq
     env_file:
       - secrets.env
     environment:
       DATABASE_USER: gitlabstats
       DATABASE_PASSWORD: somepassword
       DATABASE_URI: jdbc:postgresql://db:5432/gitlabstats?stringtype=unspecified
+      RABBITMQ_USER: 'user'
+      RABBITMQ_PASSWORD: 'somePassword'
+      RABBITMQ_HOST: 'rabbitmq'
+  rabbitmq:
+    image: rabbitmq:3
+    environment:
+      RABBITMQ_DEFAULT_USER: 'user'
+      RABBITMQ_DEFAULT_PASS: 'somePassword'
 
 volumes:
   grafana-storage:

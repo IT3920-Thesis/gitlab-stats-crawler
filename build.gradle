@@ -30,6 +30,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
 
+    // Queue technology
+    implementation("io.micronaut.rabbitmq:micronaut-rabbitmq")
+
     // Caching
     implementation("io.micronaut.cache:micronaut-cache-core")
     implementation("io.micronaut.cache:micronaut-cache-caffeine")
@@ -90,11 +93,13 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "17"
+            incremental = true
         }
     }
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = "17"
+            incremental = true
         }
     }
 }

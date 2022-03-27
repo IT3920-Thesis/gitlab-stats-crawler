@@ -80,3 +80,8 @@ flyway:
 
 gitlabapi:
   accessToken: ${GITLAB_ACCESS_TOKEN}
+
+rabbitmq:
+  host: ${RABBITMQ_HOST}
+  username: ${RABBITMQ_USER}
+  password: ${RABBITMQ_PASSWORD}

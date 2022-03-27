@@ -71,4 +71,16 @@ interface GitlabApiClient {
     filePath: String,
     ref: String = "master",
   ): Publisher<GitlabFile>
+
+  /**
+   * Retrieves a specific file on gitlab, based on the specific files
+   * */
+  @Get(
+    uri = "/api/v4/projects/{projectId}/repository/files?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listFilesInRepository(
+    projectId: String,
+    page: Int = 1,
+  ): Publisher<List<GitlabFileSummary>>
 }

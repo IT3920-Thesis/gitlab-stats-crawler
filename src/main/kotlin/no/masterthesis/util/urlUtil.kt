@@ -1,3 +1,3 @@
 package no.masterthesis.util
 
-fun String.base64UrlEncode() = this.replace("/", "%2F")
+fun String.encodeUriComponent() = this.replace("/", "%2F")

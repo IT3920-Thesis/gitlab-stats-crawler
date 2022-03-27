@@ -19,10 +19,11 @@ import org.slf4j.LoggerFactory
 
 @Singleton
 @Requires(notEnv = [Environment.TEST])
-internal class GitlabCrawler(
+internal open class GitlabCrawler(
   @Inject private val commitCrawler: GitlabCommitCrawler,
   @Inject private val groupCrawler: GitlabGroupCrawler,
   @Inject private val publisher: ApplicationEventPublisher<GitlabCommitEvent>,
+  @Inject private val gitlabProjectClient: GitlabProjectClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -32,19 +33,36 @@ internal class GitlabCrawler(
    * */
   @EventListener
   @Async
-  fun crawlGitlab(event: ServiceReadyEvent) {
+  open fun crawlGitlab(event: ServiceReadyEvent) {
     log.info("Application has started. Crawling for gitlab metadata...")
     val startTime = System.currentTimeMillis()
     // This base group represents the course
     val groupId = "it3920-gitlab-projects-examples"
+
     // These subgroups represent the group a team is member of
     val groups = runBlocking { groupCrawler.crawlGitlabGroup(groupId) }
 
-    extractDiffsInGroups(groupId, groups)
+    groups.map { subGroup ->
+      subGroup
+        .projects
+        // Archived projects can we discard immediately
+        .filter { !it.isArchived }
+        .map { project ->
+          gitlabProjectClient.publish(GitlabCrawlProjectEvent(
+            rootGroupId = groupId,
+            subGroupId = subGroup.groupId,
+            projectPath = project.path,
+            projectId = project.id,
+            defaultBranch = project.defaultBranch,
+          ))
+        }
+    }
 
-    val endTime = System.currentTimeMillis()
-    val timeTakenSeconds = (endTime - startTime) / 1000
-    log.info("Crawling completed", kv("timeTakenSeconds", timeTakenSeconds))
+//    extractDiffsInGroups(groupId, groups)
+//
+//    val endTime = System.currentTimeMillis()
+//    val timeTakenSeconds = (endTime - startTime) / 1000
+//    log.info("Crawling completed", kv("timeTakenSeconds", timeTakenSeconds))
   }
 
   private fun extractDiffsInGroups(rootGroupId: String, groups: List<GitlabAggregatedGroup>) {

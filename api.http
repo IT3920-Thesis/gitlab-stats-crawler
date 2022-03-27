@@ -35,3 +35,7 @@ PRIVATE-TOKEN: {{gitlabAccessToken}}
 ###
 GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/it3920-gitlab-projects-examples%2Fgroup2022001%2Frandominternalproject002/repository/files/.mailmap?ref=master
 PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+###
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/it3920-gitlab-projects-examples%2FgroupIT2810_group58%2Fproject4_2810/repository/tree?recursive=true&per_page=100&page=1
+PRIVATE-TOKEN: {{gitlabAccessToken}}

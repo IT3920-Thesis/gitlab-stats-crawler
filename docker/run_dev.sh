@@ -3,9 +3,8 @@
 set -e
 set -o pipefail
 
-./gradlew -v
 echo ""
 
-gradle assemble --no-daemon
+gradle assemble --no-daemon --build-cache
 
 java -Dcom.sun.management.jmxremote -Xmx128m -jar ./build/libs/gitlabstatscrawler-*-all.jar

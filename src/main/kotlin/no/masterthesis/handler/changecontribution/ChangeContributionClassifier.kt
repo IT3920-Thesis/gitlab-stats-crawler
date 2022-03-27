@@ -5,6 +5,7 @@ import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.domain.changecontribution.ContributionType
 import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
+import no.masterthesis.util.CodeQualityParser
 import org.slf4j.LoggerFactory
 
 @Singleton
@@ -106,7 +107,7 @@ internal object ChangeContributionClassifier {
 
   @Suppress("ReturnCount")
   private fun isConfigurationFile(fileName: String): Boolean {
-    if (isLinterConfig(fileName)) {
+    if (CodeQualityParser.isLinterConfig(fileName)) {
       return true
     }
 
@@ -147,26 +148,6 @@ internal object ChangeContributionClassifier {
 
     // Generic configuration file
     if (isJsonFile(fileName) || isYamlFile(fileName) || isGeneralConfigurationExtension) {
-      return true
-    }
-
-    return false
-  }
-
-  private fun isLinterConfig(fileName: String): Boolean {
-    // The eslint config file can have many suffixes
-    // See https://eslint.org/docs/user-guide/configuring/configuration-files
-    val isEsLint = fileName.contains(".eslintrc", true)
-      || fileName.endsWith(".eslintignore", true)
-
-    if (isEsLint) {
-      return true
-    }
-
-    val isPrettierConfig = fileName.contains(".prettierrc", true)
-      || fileName.contains("prettier.config")
-
-    if (isPrettierConfig) {
       return true
     }
 

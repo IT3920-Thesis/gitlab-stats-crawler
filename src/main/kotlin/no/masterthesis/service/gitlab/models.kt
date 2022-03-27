@@ -94,3 +94,12 @@ data class GitlabFile(
 
   val contentBase64Decoded by lazy { String(base64Decoder.decode(content)) }
 }
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabFileSummary(
+  val id: String,
+  val name: String,
+  val type: String,
+  val path: String,
+)
