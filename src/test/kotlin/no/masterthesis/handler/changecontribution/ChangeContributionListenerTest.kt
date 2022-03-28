@@ -3,7 +3,6 @@ package no.masterthesis.handler.changecontribution
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import no.masterthesis.configuration.TestContainersWrapper
-import no.masterthesis.event.GitlabCommitEvent
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import org.junit.jupiter.api.Test
 
@@ -20,14 +19,14 @@ internal class ChangeContributionListenerTest : TestContainersWrapper() {
     val events = commitCrawler.findAllCommitsByProject(15463).takeLast(3)
 
     events.forEach {
-      changeContributionListener.onCommit(GitlabCommitEvent(
-        rootGroupId = "it3920-gitlab-projects-examples",
-        groupId = "group2022001",
-        repositoryPath = "randominternalproject002",
-        projectId = 15463,
-        defaultBranch = "master",
-        commit = it,
-      ))
+//      changeContributionListener.onCommit(GitlabCommitEvent(
+//        rootGroupId = "it3920-gitlab-projects-examples",
+//        groupId = "group2022001",
+//        repositoryPath = "randominternalproject002",
+//        projectId = 15463,
+//        defaultBranch = "master",
+//        commit = it,
+//      ))
     }
   }
 }

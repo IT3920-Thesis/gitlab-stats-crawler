@@ -1,44 +1,76 @@
 package no.masterthesis.handler.changecontribution
 
-import io.micronaut.runtime.event.annotation.EventListener
-import io.micronaut.scheduling.annotation.Async
+import io.micronaut.rabbitmq.annotation.Queue
+import io.micronaut.rabbitmq.annotation.RabbitListener
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.domain.changecontribution.ChangeContribution
 import no.masterthesis.domain.changecontribution.ChangeContributionRepository
 import no.masterthesis.event.GitlabCommitEvent
+import no.masterthesis.factory.RABBITMQ_CRAWL_CONTRIBUTION_ID
+import no.masterthesis.handler.GitlabCrawlProjectEvent
 import no.masterthesis.handler.changecontribution.ChangeContributionClassifier.predictContributionType
 import no.masterthesis.handler.changecontribution.GitDiffParser.countLinesChanged
 import no.masterthesis.service.gitlab.GitCommit
+import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import no.masterthesis.service.gitlab.GitlabFileCrawler
-import no.masterthesis.util.MailMapParser
 import org.slf4j.LoggerFactory
 
 @Singleton
+@RabbitListener
 internal open class ChangeContributionListener(
   @Inject private val repository: ChangeContributionRepository,
   @Inject private val fileCrawler: GitlabFileCrawler,
+  @Inject private val commitCrawler: GitlabCommitCrawler,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  @EventListener
-  @Async
-  open fun onCommit(event: GitlabCommitEvent) {
+  /**
+   * Crawls and classifies the "Change contributions" (See domain [ChangeContribution]),
+   * on a per-project basis.
+   *
+   * Triggers when a project is pushed to [RABBITMQ_CRAWL_CONTRIBUTION_ID].
+   * In case of transient failures, such as rate-limiting or connection problems with GitLab,
+   * [onProject] will be retried with the same project if it throws an exception.
+   * */
+  @Queue(RABBITMQ_CRAWL_CONTRIBUTION_ID, numberOfConsumers = 1)
+  fun onProject(event: GitlabCrawlProjectEvent) {
+    log.info(
+      "Received new project to crawl change contribution from",
+      kv("event", event),
+    )
+
+    val commits = commitCrawler.findAllCommitsByProject(event.projectId)
+    log.info("Commits retrieved", kv("projectId", event.projectId), kv("commits", commits.size))
+
+    commits
+      // Merge commits should be excluded because they often double count contributions
+      .filter { !isMergeCommit(it) }
+      .map { classifyChangeContribution(event, it) }
+      // Save contributions in batches in case a single commit has a lot of changes
+      .forEach {
+        repository.saveAll(it)
+        log.trace("Contributions saved to database", kv("contributions", it))
+      }
+
+    log.info("Completed change contribution crawling", kv("event", event))
+  }
+
+  private fun classifyChangeContribution(event: GitlabCrawlProjectEvent, commit: GitCommit): List<ChangeContribution> {
     log.info(
       "Received new commit event",
-      kv("groupId", event.groupId),
-      kv("repositoryPath", event.repositoryPath),
-      kv("commitSha", event.commit.id),
-      kv("diffs", event.commit.diffs.size),
+      kv("subGroupId", event.subGroupId),
+      kv("projectPath", event.projectPath),
+      kv("commitSha", commit.id),
+      kv("diffs", commit.diffs.size),
     )
-    val commit = event.commit
+
     val contributions = commit.diffs
       .flatMap {
         extractContributions(
-          groupId = event.groupId,
-          repositoryId = event.repositoryPath,
+          groupId = event.subGroupId,
+          repositoryId = event.projectPath,
           commit = commit,
         )
       }
@@ -46,8 +78,13 @@ internal open class ChangeContributionListener(
         overrideCommitEmails(it, projectId = event.projectId.toString(), branch = event.defaultBranch)
       }
 
-    log.trace("Extracted contributions", kv("contributions", contributions), kv("groupId", event.groupId), kv("repositoryId", event.repositoryPath))
-    repository.saveAll(contributions)
+    log.trace(
+      "Extracted contributions",
+      kv("contributions", contributions),
+      kv("subGroupId", event.subGroupId),
+      kv("projectPath", event.projectPath),
+    )
+    return contributions
   }
 
   private fun overrideCommitEmails(contribution: ChangeContribution, projectId: String, branch: String): ChangeContribution {
@@ -82,8 +119,14 @@ internal open class ChangeContributionListener(
         type = contributionType,
         linesAdded = linesAdded,
         linesRemoved = linesRemoved,
+
+        isFileNew = it.isNewFile,
+        isFileDeleted = it.isFileDeleted,
+        previousFilePath = if (it.oldPath !== it.newPath) it.oldPath else null,
       )
 
+      // Multiple people may have contributed to the same file
+      // we expect this to be flagged using "co-authored-by:" in commit messages
       val coContributions = extractCoAuthors(commit).map { coAuthor ->
         // Everything in the contribution is the same, exception the co-authors email
         primaryContribution.copy(authorEmail = coAuthor.email)
@@ -91,6 +134,13 @@ internal open class ChangeContributionListener(
 
       coContributions.plus(primaryContribution)
     }
+  }
+
+  private fun isMergeCommit(commit: GitCommit): Boolean {
+    val title = commit.title
+
+    return title.contains("Merge branch '")
+      && title.contains("' into '")
   }
 
   /**

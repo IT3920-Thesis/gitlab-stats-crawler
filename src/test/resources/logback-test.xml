@@ -4,8 +4,14 @@
         </encoder>
     </appender>
 
-    <logger name="io.micronaut.http.client" level="INFO"/>
+    <logger name="io.micronaut.http.client" level="TRACE"/>
+<!--    <logger name="io.micronaut.rabbitmq" level="TRACE"/>-->
+<!--    <logger name="com.rabbitmq" level="TRACE"/>-->
     <logger name="no.masterthesis" level="INFO"/>
+
+    <!--    Uncomment lines bellow to debug test-containers failures -->
+<!--    <logger name="org.testcontainers" level="DEBUG"/>-->
+<!--    <logger name="com.github.dockerjava" level="DEBUG"/>-->
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

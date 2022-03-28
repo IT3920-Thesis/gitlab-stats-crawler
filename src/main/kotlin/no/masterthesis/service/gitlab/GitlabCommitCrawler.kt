@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments.kv
+import no.masterthesis.util.FileClassifierUtil
 import org.slf4j.LoggerFactory
 
 data class GitCommit(
@@ -39,7 +40,8 @@ class GitlabCommitCrawler(
    * */
   fun findAllCommitsByProject(projectId: Long): List<GitCommit> = runBlocking {
     val commits = retrieveAllCommits(projectId)
-    log.info("Commits in project. Extracting diffs...",
+    log.info(
+      "Commits in project. Extracting diffs...",
       kv("projectId", projectId),
       kv("numberOfCommits", commits.size),
     )
@@ -78,26 +80,32 @@ class GitlabCommitCrawler(
   private fun retrieveAllDiffs(projectId: Long, commitSha: Set<String>): Map<String, List<GitlabGitCommitDiff>> {
     val diffs = commitSha
       .chunked(10)
-      .flatMap { commits -> runBlocking {
-        delay(5)
-        commits.map { sha -> sha to retrieveAllDiffsForCommit(projectId, sha) }
-      } }
+      .flatMap { commits ->
+        runBlocking {
+          delay(5)
+          commits.map { sha -> sha to retrieveDiffsForCommit(projectId, sha) }
+        }
+      }
       .associate { it.first to it.second }
 
     return diffs
   }
 
-  private suspend fun retrieveAllDiffsForCommit(projectId: Long, commitSha: String): List<GitlabGitCommitDiff> {
+  private suspend fun retrieveDiffsForCommit(projectId: Long, commitSha: String): List<GitlabGitCommitDiff> {
     val allDiffs = ArrayList<GitlabGitCommitDiff>()
     var currentPage = 1
 
     while (true) {
       log.trace("Requesting diff for commit", kv("projectId", projectId), kv("commitSha", commitSha), kv("page", currentPage))
-      val page = client.findCommitDiffs(
-        projectId = projectId,
-        commitSha = commitSha,
-        page = currentPage,
-      ).awaitSingle()
+      val page = client
+        .findCommitDiffs(
+          projectId = projectId,
+          commitSha = commitSha,
+          page = currentPage,
+        )
+        .awaitSingle()
+        // Build folders can be massive (such as node_modules), and are discarded to save space
+        .filter { !FileClassifierUtil.isInBuildFolder(it.newPath) }
 
       // Continue until gitlab has no more data to return
       if (page.isEmpty()) {

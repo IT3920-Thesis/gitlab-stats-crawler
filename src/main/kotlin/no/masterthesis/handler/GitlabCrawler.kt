@@ -27,29 +27,48 @@ internal open class GitlabCrawler(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
+  companion object {
+    /**
+     * @var A root group in GitLab which represents a "course" (and the semester it is taught)
+     * */
+    private const val COURSE_ROOT_GROUP_NAME = "it3920-gitlab-projects-examples"
+  }
+
   /**
-   * Regular job that re-syncs with Gitlab every 24 hours,
-   * and once on deployment
+   * This job crawls gitlab for subgroups and their projects inside a [COURSE_ROOT_GROUP_NAME].
+   * Inside we expect that each subgroup represents a "Student Group",
+   * where students have one or multiple repositories.
+   *
+   * ```
+   * rootGroup (Course, isolated to the semester it is taught)
+   *   | studentGroup1
+   *     | project1
+   *     | project2
+   *     ...
+   *     | projectN
+   *   | studentGroup2
+   *     | project1
+   *   ...
+   *   | studentGroupN
+   * ```
+   *
    * */
   @EventListener
   @Async
   open fun crawlGitlab(event: ServiceReadyEvent) {
     log.info("Application has started. Crawling for gitlab metadata...")
-    val startTime = System.currentTimeMillis()
-    // This base group represents the course
-    val groupId = "it3920-gitlab-projects-examples"
-
     // These subgroups represent the group a team is member of
-    val groups = runBlocking { groupCrawler.crawlGitlabGroup(groupId) }
+    val subGroups = runBlocking { groupCrawler.crawlGitlabGroup(COURSE_ROOT_GROUP_NAME) }
 
-    groups.map { subGroup ->
+    subGroups.map { subGroup ->
       subGroup
         .projects
         // Archived projects can we discard immediately
         .filter { !it.isArchived }
+//        .filter { it.id == 15903L } // TODO(fredrfli) Remove, so we can crawl all sites
         .map { project ->
           gitlabProjectClient.publish(GitlabCrawlProjectEvent(
-            rootGroupId = groupId,
+            rootGroupId = COURSE_ROOT_GROUP_NAME,
             subGroupId = subGroup.groupId,
             projectPath = project.path,
             projectId = project.id,
@@ -57,12 +76,7 @@ internal open class GitlabCrawler(
           ))
         }
     }
-
-//    extractDiffsInGroups(groupId, groups)
-//
-//    val endTime = System.currentTimeMillis()
-//    val timeTakenSeconds = (endTime - startTime) / 1000
-//    log.info("Crawling completed", kv("timeTakenSeconds", timeTakenSeconds))
+    log.info("Groups crawled and published to exchange")
   }
 
   private fun extractDiffsInGroups(rootGroupId: String, groups: List<GitlabAggregatedGroup>) {

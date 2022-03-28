@@ -10,6 +10,8 @@ CREATE TABLE changecontribution(
     lines_added BIGINT NOT NULL DEFAULT 0,
     lines_removed BIGINT NOT NULL DEFAULT 0,
     previous_file_path VARCHAR(255) DEFAULT NULL,
+    is_file_new boolean NOT NULL DEFAULT false,
+    is_file_deleted boolean NOT NULL DEFAULT false,
 
     PRIMARY KEY (group_id, repository_id, author_email, commit_sha, file_path)
 );

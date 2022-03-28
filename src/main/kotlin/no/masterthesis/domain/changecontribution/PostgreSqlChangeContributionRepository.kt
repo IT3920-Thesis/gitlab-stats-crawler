@@ -24,10 +24,10 @@ internal class PostgreSqlChangeContributionRepository(
   override fun saveAll(contributions: List<ChangeContribution>) {
     jdbi.withHandle<Unit, Exception> { handle ->
       val batch = handle.prepareBatch("""
-        INSERT INTO $TABLE_NAME (group_id, repository_id, author_email, commit_sha, file_path, type, timestamp, lines_added, lines_removed, previous_file_path) 
-        VALUES (:group_id, :repository_id, :author_email, :commit_sha, :file_path, :type, :timestamp, :lines_added, :lines_removed, :previous_file_path)
+        INSERT INTO $TABLE_NAME (group_id, repository_id, author_email, commit_sha, file_path, type, timestamp, lines_added, lines_removed, previous_file_path, is_file_new, is_file_deleted) 
+        VALUES (:group_id, :repository_id, :author_email, :commit_sha, :file_path, :type, :timestamp, :lines_added, :lines_removed, :previous_file_path, :is_file_new, :is_file_deleted)
         ON CONFLICT (group_id, repository_id, author_email, commit_sha, file_path) DO UPDATE
-        SET type=:type, timestamp=:timestamp, lines_added=:lines_added, lines_removed=:lines_removed, previous_file_path=:previous_file_path
+        SET type=:type, timestamp=:timestamp, lines_added=:lines_added, lines_removed=:lines_removed, previous_file_path=:previous_file_path, is_file_new=:is_file_new, is_file_deleted=:is_file_deleted
       """.trimIndent())
 
       contributions.forEach {
@@ -42,6 +42,8 @@ internal class PostgreSqlChangeContributionRepository(
           .bind("lines_added", it.linesAdded)
           .bind("lines_removed", it.linesRemoved)
           .bind("previous_file_path", it.previousFilePath)
+          .bind("is_file_new", it.isFileNew)
+          .bind("is_file_deleted", it.isFileDeleted)
           .add()
       }
 

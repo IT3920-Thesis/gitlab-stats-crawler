@@ -51,6 +51,10 @@ data class ChangeContribution(
   val filePath: String,
   val type: ContributionType,
   val createdOn: ZonedDateTime,
+
+  val isFileNew: Boolean = false,
+  val isFileDeleted: Boolean = false,
+
   /**
    * The number of lines added for the specified commit and filePath.
    * It should adjust for renames/file moves.

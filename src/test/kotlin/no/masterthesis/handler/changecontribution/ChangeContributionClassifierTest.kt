@@ -128,6 +128,12 @@ internal class ChangeContributionClassifierTest {
     "random_xml_file.xml",
     "package.json",
     "package-lock.json",
+    "tsconfig.json",
+    ".babelrc",
+    ".babelrc.json",
+    ".babelrc.js",
+    "babel.config.js",
+    "babel.config.json",
   ])
   fun `'predictContributionTypes' predicts typical config files as Configuration`(fileName: String) {
     val commit = generateCommit(listOf(

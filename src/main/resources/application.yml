@@ -16,9 +16,9 @@ micronaut:
 
     services:
       gitlabapi:
+        exception-on-error-status: true
         urls:
           - "https://gitlab.stud.idi.ntnu.no"
-        exception-on-error-status: true
         # NTNU has screwed up their certificate...
         # Trust it until Java can naturally validate the complete certificate chain
         ssl:

@@ -4,6 +4,8 @@
         </encoder>
     </appender>
 
+    <logger name="io.micronaut.http.client" level="INFO"/>
+
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
