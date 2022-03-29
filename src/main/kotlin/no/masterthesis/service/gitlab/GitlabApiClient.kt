@@ -30,7 +30,7 @@ interface GitlabApiClient {
    * TODO(fredrfli) Implement pagination, since gitlab api returns max 100 items
    * */
   @Get(
-    uri = "/api/v4/projects/{projectId}/repository/commits?all=true&per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    uri = "/api/v4/projects/{projectId}/repository/commits?all=true&with_stats=true&per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
     consumes = [MediaType.APPLICATION_JSON],
   )
   fun findAllCommitsByProject(projectId: Long, page: Int = 1): Publisher<List<GitlabGitCommit>>

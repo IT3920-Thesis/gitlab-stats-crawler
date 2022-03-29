@@ -31,7 +31,6 @@ locals {
 }
 
 provider "aws" {
-  profile = "linio"
   region = "us-east-1"
 }
 

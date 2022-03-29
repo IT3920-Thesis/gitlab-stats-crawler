@@ -31,7 +31,14 @@ data class GitlabGitCommit(
   val createdAt: ZonedDateTime,
   val parentIds: List<String>,
   val webUrl: String?,
-)
+  val stats: Stats,
+) {
+  data class Stats(
+    val additions: Int,
+    val deletions: Int,
+    val total: Int
+  )
+}
 
 @Introspected
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)

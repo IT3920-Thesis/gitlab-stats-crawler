@@ -2,11 +2,11 @@
 GET http://localhost:8080/health
 
 ###
-GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits?all=true&per_page=2000
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/15903/repository/commits?all=true&per_page=2000&with_stats=true
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
-GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/1021/repository/commits/1cbef1813a76cfd315f61fc87e99d3484737c665/diff
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/15903/repository/commits/a48421190165bb83dd515b2b24445328cb41317a
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###

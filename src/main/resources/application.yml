@@ -8,6 +8,9 @@ micronaut:
   caches:
     mailmap:
       maximum-size: 1000
+    commits:
+      maximum-size: 1000
+      expire-after-write: '1h'
 
   http:
     client:

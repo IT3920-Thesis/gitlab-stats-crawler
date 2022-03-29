@@ -23,9 +23,36 @@ internal class PostgreSqlChangeContributionRepository(
 
   override fun saveAll(contributions: List<ChangeContribution>) {
     jdbi.withHandle<Unit, Exception> { handle ->
+      @Suppress("MaxLineLength")
       val batch = handle.prepareBatch("""
-        INSERT INTO $TABLE_NAME (group_id, repository_id, author_email, commit_sha, file_path, type, timestamp, lines_added, lines_removed, previous_file_path, is_file_new, is_file_deleted) 
-        VALUES (:group_id, :repository_id, :author_email, :commit_sha, :file_path, :type, :timestamp, :lines_added, :lines_removed, :previous_file_path, :is_file_new, :is_file_deleted)
+        INSERT INTO $TABLE_NAME (
+          group_id, 
+          repository_id, 
+          author_email, 
+          commit_sha, 
+          file_path, 
+          type, 
+          timestamp, 
+          lines_added, 
+          lines_removed, 
+          previous_file_path, 
+          is_file_new, 
+          is_file_deleted
+        ) 
+        VALUES (
+          :group_id, 
+          :repository_id, 
+          :author_email, 
+          :commit_sha, 
+          :file_path, 
+          :type,
+          :timestamp, 
+          :lines_added, 
+          :lines_removed, 
+          :previous_file_path, 
+          :is_file_new, 
+          :is_file_deleted
+        )
         ON CONFLICT (group_id, repository_id, author_email, commit_sha, file_path) DO UPDATE
         SET type=:type, timestamp=:timestamp, lines_added=:lines_added, lines_removed=:lines_removed, previous_file_path=:previous_file_path, is_file_new=:is_file_new, is_file_deleted=:is_file_deleted
       """.trimIndent())
@@ -47,8 +74,8 @@ internal class PostgreSqlChangeContributionRepository(
           .add()
       }
 
-      val rowsChanged = batch.execute()
-      log.info("Successfully executed query", kv("rowsChanged", rowsChanged.size))
+      batch.execute()
+      log.trace("Successfully executed query")
     }
   }
 }

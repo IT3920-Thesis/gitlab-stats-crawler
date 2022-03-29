@@ -7,10 +7,9 @@ import jakarta.inject.Singleton
 import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.domain.changecontribution.ChangeContribution
 import no.masterthesis.domain.changecontribution.ChangeContributionRepository
-import no.masterthesis.event.GitlabCommitEvent
 import no.masterthesis.factory.RABBITMQ_CRAWL_CONTRIBUTION_ID
 import no.masterthesis.handler.GitlabCrawlProjectEvent
-import no.masterthesis.handler.changecontribution.ChangeContributionClassifier.predictContributionType
+import no.masterthesis.util.ChangeContributionClassifier.predictContributionType
 import no.masterthesis.handler.changecontribution.GitDiffParser.countLinesChanged
 import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
@@ -58,14 +57,6 @@ internal open class ChangeContributionListener(
   }
 
   private fun classifyChangeContribution(event: GitlabCrawlProjectEvent, commit: GitCommit): List<ChangeContribution> {
-    log.info(
-      "Received new commit event",
-      kv("subGroupId", event.subGroupId),
-      kv("projectPath", event.projectPath),
-      kv("commitSha", commit.id),
-      kv("diffs", commit.diffs.size),
-    )
-
     val contributions = commit.diffs
       .flatMap {
         extractContributions(

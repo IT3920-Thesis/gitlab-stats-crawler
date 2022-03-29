@@ -1,5 +1,6 @@
 package no.masterthesis.service.gitlab
 
+import io.micronaut.cache.annotation.Cacheable
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import java.time.ZonedDateTime
@@ -17,6 +18,7 @@ data class GitCommit(
   val message: String?,
   val committer: Author,
   val diffs: List<GitlabGitCommitDiff>,
+  val stats: GitlabGitCommit.Stats,
 ) {
   data class Author(
     val name: String?,
@@ -28,7 +30,7 @@ data class GitCommit(
  * Service that crawls Gitlab for commit information
  * */
 @Singleton
-class GitlabCommitCrawler(
+open class GitlabCommitCrawler(
   @Inject private val client: GitlabApiClient,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -38,7 +40,8 @@ class GitlabCommitCrawler(
    * @param projectId The numeric project id in Gitlab (make sure you have access to this project)
    * @return List of commits with associated differences
    * */
-  fun findAllCommitsByProject(projectId: Long): List<GitCommit> = runBlocking {
+  @Cacheable("commits", parameters = ["projectId"])
+  open fun findAllCommitsByProject(projectId: Long): List<GitCommit> = runBlocking {
     val commits = retrieveAllCommits(projectId)
     log.info(
       "Commits in project. Extracting diffs...",
@@ -73,6 +76,7 @@ class GitlabCommitCrawler(
           email = commitMetadata.committerEmail,
         ),
         diffs = diffs,
+        stats = commitMetadata.stats,
       )
     }
   }

@@ -2,8 +2,9 @@ package no.masterthesis.handler.changecontribution
 
 import java.time.ZonedDateTime
 import no.masterthesis.domain.changecontribution.ContributionType
-import no.masterthesis.handler.changecontribution.ChangeContributionClassifier.predictContributionType
+import no.masterthesis.util.ChangeContributionClassifier.predictContributionType
 import no.masterthesis.service.gitlab.GitCommit
+import no.masterthesis.service.gitlab.GitlabGitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -165,5 +166,10 @@ internal class ChangeContributionClassifierTest {
     createdAt = ZonedDateTime.now(),
     title = "Add functional tests",
     diffs = diffs,
+    stats = GitlabGitCommit.Stats(
+      additions = 0,
+      deletions = 0,
+      total = 0,
+    ),
   )
 }

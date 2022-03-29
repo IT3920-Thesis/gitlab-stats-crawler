@@ -39,6 +39,9 @@ internal open class GitlabCrawler(
    * Inside we expect that each subgroup represents a "Student Group",
    * where students have one or multiple repositories.
    *
+   * Each project is published to RabbitMQ as [GitlabCrawlProjectEvent],
+   * which other crawlers and parsers subscribes to.
+   *
    * ```
    * rootGroup (Course, isolated to the semester it is taught)
    *   | studentGroup1

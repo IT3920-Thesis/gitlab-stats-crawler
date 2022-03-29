@@ -10,8 +10,13 @@ import org.slf4j.LoggerFactory
 
 const val RABBITMQ_CRAWL_PROJECT_ID = "crawlGitlabProject"
 const val RABBITMQ_CRAWL_CONTRIBUTION_ID = "crawlChangeContribution"
+const val RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID = "commitAggregate"
 const val RABBITMQ_FANOUT_PROJECT_CRAWLED = "gitlabProject"
 
+/**
+ * Connects to RabbitMQ and allow us to add custom configurations,
+ * create queues or exchanges (consept used to utilize Pub/Sub-pattern)
+ * */
 @Singleton
 internal class RabbitMQChannelPoolInitializer : ChannelInitializer() {
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -25,6 +30,7 @@ internal class RabbitMQChannelPoolInitializer : ChannelInitializer() {
     val queues = listOf(
       RABBITMQ_CRAWL_PROJECT_ID,
       RABBITMQ_CRAWL_CONTRIBUTION_ID,
+      RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID,
     ).map {
       val queue = channel.queueDeclare(
         it,

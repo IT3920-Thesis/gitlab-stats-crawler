@@ -1,15 +1,11 @@
-package no.masterthesis.handler.changecontribution
+package no.masterthesis.util
 
-import jakarta.inject.Singleton
 import net.logstash.logback.argument.StructuredArguments.kv
 import no.masterthesis.domain.changecontribution.ContributionType
-import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommitDiff
-import no.masterthesis.util.CodeQualityParser
 import org.slf4j.LoggerFactory
 
-@Singleton
-internal object ChangeContributionClassifier {
+object ChangeContributionClassifier {
   private val log = LoggerFactory.getLogger(this::class.java)
   private val javaScriptEndings = setOf("js", "ts", "jsx", "tsx", "mjs")
   private val stylesheetEndings = setOf("less", "css", "sass", "scss")
