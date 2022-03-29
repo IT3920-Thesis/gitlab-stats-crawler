@@ -49,43 +49,46 @@ locals {
   database_uri = "jdbc:postgresql://${aws_db_instance.database.endpoint}/${aws_db_instance.database.name}?stringtype=unspecified&sslmode=require"
 }
 
-//resource "aws_apprunner_service" "application" {
-//  service_name = "${var.application_name}-${var.environment}"
-//
-//  health_check_configuration {
-//    interval = 20
-//    path = "/health"
-//    protocol = "HTTP"
-//    healthy_threshold = 2
-//    unhealthy_threshold = 3
-//    timeout = 2
-//  }
-//
-//  source_configuration {
-//    auto_deployments_enabled = false
-//
-//    image_repository {
-//      image_configuration {
-//        port = "8080"
-//
-//        runtime_environment_variables = {
-//          DATABASE_USER = aws_db_instance.database.username
-//          DATABASE_PASSWORD = random_password.database_password.result
-//          DATABASE_URI = local.database_uri
-//          GITLAB_ACCESS_TOKEN = var.gitlab_access_token
-//        }
-//      }
-//      image_identifier = "${var.ecr_image_url}:${var.image_tag}"
-//      image_repository_type = "ECR"
-//    }
-//
-//    authentication_configuration {
-//      access_role_arn = aws_iam_role.application_image_builder.arn
-//    }
-//  }
-//
-//  tags = var.tags
-//}
+resource "aws_apprunner_service" "application" {
+  service_name = "${var.application_name}-${var.environment}"
+
+  health_check_configuration {
+    interval = 20
+    path = "/health"
+    protocol = "HTTP"
+    healthy_threshold = 2
+    unhealthy_threshold = 3
+    timeout = 2
+  }
+
+  source_configuration {
+    auto_deployments_enabled = false
+
+    image_repository {
+      image_configuration {
+        port = "8080"
+
+        runtime_environment_variables = {
+          DATABASE_USER = aws_db_instance.database.username
+          DATABASE_PASSWORD = random_password.database_password.result
+          DATABASE_URI = local.database_uri
+          GITLAB_ACCESS_TOKEN = var.gitlab_access_token
+          RABBITMQ_USER = random_string.rabbitmq_user.result
+          RABBITMQ_PASSWORD = random_password.rabbitmq_password.result
+          RABBITMQ_HOST = aws_mq_broker.rabbitmq.instances[0].endpoints[0]
+        }
+      }
+      image_identifier = "${var.ecr_image_url}:${var.image_tag}"
+      image_repository_type = "ECR"
+    }
+
+    authentication_configuration {
+      access_role_arn = aws_iam_role.application_image_builder.arn
+    }
+  }
+
+  tags = var.tags
+}
 
 resource "aws_secretsmanager_secret" "database_uri" {
   name = "${var.application_name}-${var.environment}/database_uri"

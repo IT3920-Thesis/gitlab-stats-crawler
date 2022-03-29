@@ -31,7 +31,7 @@ services:
       DATABASE_URI: jdbc:postgresql://db:5432/gitlabstats?stringtype=unspecified
       RABBITMQ_USER: 'user'
       RABBITMQ_PASSWORD: 'somePassword'
-      RABBITMQ_HOST: 'rabbitmq'
+      RABBITMQ_HOST: 'amqp://rabbitmq'
   rabbitmq:
     image: rabbitmq:3
     environment:
