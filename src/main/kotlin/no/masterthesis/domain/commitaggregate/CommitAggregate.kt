@@ -14,6 +14,7 @@ data class CommitAggregate(
   val message: Message? = null,
   val filesChanged: Int,
   val testClassification: TestBalance,
+  val isMergeCommit: Boolean,
 
   val gitLabIssuesReferenced: Set<String> = emptySet(),
 ) {

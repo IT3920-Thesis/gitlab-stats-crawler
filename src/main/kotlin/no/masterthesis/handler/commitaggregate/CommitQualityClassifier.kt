@@ -56,8 +56,8 @@ internal object CommitQualityClassifier {
       return CommitAggregate.TestBalance.MIXED
     }
 
-    val testPercentage = testChanges.size / (otherChanges.size + testChanges.size)
-    log.info(
+    val testPercentage = testChanges.size.toDouble() / (otherChanges.size + testChanges.size)
+    log.trace(
       "Calculated test percentage for commit",
       kv("commitSha", commit.id),
       kv("testPercentage", testPercentage),
@@ -74,6 +74,16 @@ internal object CommitQualityClassifier {
     }
   }
 
+  fun isMergeCommit(commit: GitCommit): Boolean {
+    val title = commit.title
+
+    // I've seen typos where the "M" in Merge was excluded,
+    // so we only match on "erge branch"
+    return title.contains("erge branch '", ignoreCase = true)
+      && (title.contains("' into '") || title.contains("' of "))
+  }
+
+
   fun extractIssueIdsReferenced(commit: GitCommit): Set<String> {
     val issuesInTitle = extractIssueIds(commit.title)
     val issuesInMessage = commit.message?.let { extractIssueIds(it) } ?: emptySet()
@@ -87,7 +97,7 @@ internal object CommitQualityClassifier {
       .split("\n")
       .flatMap { it.split(" ") }
 
-    log.info("Tokens", kv("tokens", tokens))
+    log.trace("Tokens", kv("tokens", tokens))
     return tokens
       .map { it.trim() }
       .filter(::isIssueReference)

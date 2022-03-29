@@ -13,6 +13,7 @@ CREATE TABLE commitaggregate
     files_changed            INT          NOT NULL DEFAULT 0,
     test_classification      VARCHAR(255) NOT NULL,
     gitlab_issues_referenced JSONB        NOT NULL,
+    is_merge_commit          boolean      NOT NULL DEFAULT false,
 
-    PRIMARY KEY (group_id, project_path, commit_sha, author_email, commit_time)
+    PRIMARY KEY (group_id, project_path, commit_sha, author_email)
 );

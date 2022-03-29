@@ -9,6 +9,7 @@ import no.masterthesis.domain.commitaggregate.CommitAggregate
 import no.masterthesis.domain.commitaggregate.CommitAggregateRepository
 import no.masterthesis.factory.RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID
 import no.masterthesis.handler.GitlabCrawlProjectEvent
+import no.masterthesis.handler.commitaggregate.CommitQualityClassifier.isMergeCommit
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import org.slf4j.LoggerFactory
 
@@ -48,6 +49,7 @@ internal class CommitAggregateListener(
         gitLabIssuesReferenced = CommitQualityClassifier.extractIssueIdsReferenced(commit),
         size = CommitQualityClassifier.classifyCommitSize(commit),
         testClassification = CommitQualityClassifier.classifyCommitTestBalance(commit),
+        isMergeCommit = isMergeCommit(commit),
       ).also {
         log.info("Constructed aggregate for commit", kv("commitSha", commit.id), kv("aggregate", it))
       }

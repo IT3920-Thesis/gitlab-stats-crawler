@@ -11,6 +11,7 @@ import no.masterthesis.factory.RABBITMQ_CRAWL_CONTRIBUTION_ID
 import no.masterthesis.handler.GitlabCrawlProjectEvent
 import no.masterthesis.util.ChangeContributionClassifier.predictContributionType
 import no.masterthesis.handler.changecontribution.GitDiffParser.countLinesChanged
+import no.masterthesis.handler.commitaggregate.CommitQualityClassifier.isMergeCommit
 import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import no.masterthesis.service.gitlab.GitlabFileCrawler
@@ -125,13 +126,6 @@ internal open class ChangeContributionListener(
 
       coContributions.plus(primaryContribution)
     }
-  }
-
-  private fun isMergeCommit(commit: GitCommit): Boolean {
-    val title = commit.title
-
-    return title.contains("Merge branch '")
-      && title.contains("' into '")
   }
 
   /**
