@@ -30,7 +30,7 @@ micronaut:
         pool:
           enabled: true
           acquire-timeout: '1s'
-          max-connections: 50
+          max-connections: 100
 
   security:
     enabled: false

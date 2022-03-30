@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory
 const val RABBITMQ_CRAWL_PROJECT_ID = "crawlGitlabProject"
 const val RABBITMQ_CRAWL_CONTRIBUTION_ID = "crawlChangeContribution"
 const val RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID = "commitAggregate"
+const val RABBITMQ_QUEUE_ISSUE_AGGREGATE_ID = "issueAggregate"
 const val RABBITMQ_FANOUT_PROJECT_CRAWLED = "gitlabProject"
 
 /**
@@ -31,6 +32,7 @@ internal class RabbitMQChannelPoolInitializer : ChannelInitializer() {
       RABBITMQ_CRAWL_PROJECT_ID,
       RABBITMQ_CRAWL_CONTRIBUTION_ID,
       RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID,
+      RABBITMQ_QUEUE_ISSUE_AGGREGATE_ID,
     ).map {
       val queue = channel.queueDeclare(
         it,

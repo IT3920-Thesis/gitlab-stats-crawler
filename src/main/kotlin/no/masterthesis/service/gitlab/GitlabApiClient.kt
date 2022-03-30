@@ -98,4 +98,32 @@ interface GitlabApiClient {
     projectId: String,
     page: Int = 1,
   ): Publisher<List<GitlabFileSummary>>
+
+  /**
+   * Lists all issues for a project
+   * */
+  @Get(
+    uri = "/api/v4/projects/{projectId}/issues/?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listIssuesInProject(
+    projectId: Long,
+    page: Int = 1,
+  ): Publisher<List<GitlabIssue>>
+
+  /**
+   * Lists all notes (comments) on an issue
+   *
+   * @param projectId
+   * @param issueIid (Not a typo) The iid from the issue
+   * */
+  @Get(
+    uri = "/api/v4/projects/{projectId}/issues/{issueIid}/notes?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listNotesInIssue(
+    projectId: Long,
+    issueIid: Long,
+    page: Int = 1,
+  ): Publisher<List<GitlabNote>>
 }

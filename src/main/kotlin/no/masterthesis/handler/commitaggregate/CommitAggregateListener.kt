@@ -29,7 +29,7 @@ internal class CommitAggregateListener(
     )
 
     val commits = commitCrawler.findAllCommitsByProject(event.projectId)
-    log.info("Commits retrieved", kv("projectId", event.projectId), kv("commits", commits.size))
+    log.trace("Commits retrieved", kv("projectId", event.projectId), kv("commits", commits.size))
 
     val aggregates = commits.map { commit ->
       CommitAggregate(
@@ -51,7 +51,7 @@ internal class CommitAggregateListener(
         testClassification = CommitQualityClassifier.classifyCommitTestBalance(commit),
         isMergeCommit = isMergeCommit(commit),
       ).also {
-        log.info("Constructed aggregate for commit", kv("commitSha", commit.id), kv("aggregate", it))
+        log.trace("Constructed aggregate for commit", kv("commitSha", commit.id), kv("aggregate", it))
       }
     }
 

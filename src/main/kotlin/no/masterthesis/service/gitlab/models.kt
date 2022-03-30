@@ -12,6 +12,14 @@ import java.util.Base64
  * into deserializable data classes.
  * */
 
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabUser(
+  val state: String,
+  val username: String,
+  val id: Long,
+)
+
 /**
  * @property id Git commit SHA
  * @property title Commit message
@@ -109,4 +117,35 @@ data class GitlabFileSummary(
   val name: String,
   val type: String,
   val path: String,
+)
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabNote(
+  val id: Long,
+  val body: String,
+  val author: GitlabUser,
+  val createdAt: ZonedDateTime,
+  val updatedAt: ZonedDateTime,
+)
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabIssue(
+  val id: String,
+  val iid: Long,
+  val title: String,
+  val description: String? = "",
+  val state: String,
+  val projectId: Long,
+  val author: GitlabUser,
+  val assignees: List<GitlabUser>,
+  val labels: Set<String>,
+  val upvotes: Int,
+  val downvotes: Int,
+  val mergeRequestsCount: Int,
+  val updatedAt: ZonedDateTime? = null,
+  val createdAt: ZonedDateTime,
+  val closedAt: ZonedDateTime? = null,
+  val closedBy: GitlabUser? = null,
 )
