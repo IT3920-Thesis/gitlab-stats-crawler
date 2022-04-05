@@ -139,8 +139,10 @@ data class GitlabMilestone(
   val state: String,
   val createdAt: ZonedDateTime,
   val updatedAt: ZonedDateTime,
+  val closedAt: ZonedDateTime? = null,
   val dueDate: ZonedDateTime? = null,
   val startDate: ZonedDateTime? = null,
+  val expired: Boolean = false,
 )
 
 @Introspected

@@ -8,11 +8,9 @@ CREATE TABLE projectmilestoneaggregate
     description   JSONB        NOT NULL,
 
     created_at    TIMESTAMP    NOT NULL,
-    author        VARCHAR(255) NOT NULL,
     start_date    TIMESTAMP DEFAULT NULL,
     due_date      TIMESTAMP DEFAULT NULL,
     closed_at     TIMESTAMP DEFAULT NULL,
-    closed_by     TIMESTAMP DEFAULT NULL,
     expired       BOOLEAN   NOT NULL DEFAULT FALSE,
 
     PRIMARY KEY (group_id, project_path, milestone_iid)
