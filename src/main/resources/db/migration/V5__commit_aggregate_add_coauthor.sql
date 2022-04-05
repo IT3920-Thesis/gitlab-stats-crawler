@@ -1,0 +1,1 @@
+ALTER TABLE commitaggregate ADD COLUMN co_author JSONB DEFAULT NULL;

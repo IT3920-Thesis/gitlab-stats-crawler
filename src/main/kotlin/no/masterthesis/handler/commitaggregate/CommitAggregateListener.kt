@@ -11,6 +11,8 @@ import no.masterthesis.factory.RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID
 import no.masterthesis.handler.GitlabCrawlProjectEvent
 import no.masterthesis.handler.commitaggregate.CommitQualityClassifier.isMergeCommit
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
+import no.masterthesis.service.gitlab.GitlabFileCrawler
+import no.masterthesis.util.MailMapUtil
 import org.slf4j.LoggerFactory
 
 @Singleton
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory
 internal class CommitAggregateListener(
   @Inject private val commitCrawler: GitlabCommitCrawler,
   @Inject private val repository: CommitAggregateRepository,
+  @Inject private val fileCrawler: GitlabFileCrawler,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -35,7 +38,11 @@ internal class CommitAggregateListener(
       CommitAggregate(
         groupId = event.subGroupId,
         projectId = event.projectPath,
-        authorEmail = commit.committer.email,
+        authorEmail = overrideCommitEmails(
+          projectId = event.projectId,
+          branch = event.defaultBranch,
+          email = commit.committer.email,
+        ),
         commitSha = commit.id,
         commitTime = commit.createdAt,
         title = CommitAggregate.Title(
@@ -56,5 +63,11 @@ internal class CommitAggregateListener(
     }
 
     repository.saveAll(aggregates)
+  }
+
+  private fun overrideCommitEmails(projectId: Long, branch: String, email: String): String {
+    val mailMap = fileCrawler.retrieveMailMap(projectId = projectId.toString(), branch)
+
+    return MailMapUtil.overrideCommitEmails(mailMap, email)
   }
 }

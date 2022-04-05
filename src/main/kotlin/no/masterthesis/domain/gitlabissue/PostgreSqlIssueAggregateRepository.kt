@@ -21,10 +21,10 @@ internal class PostgreSqlIssueAggregateRepository(
     jdbi.withHandle<Unit, Exception> { handle ->
       @Suppress("MaxLineLength")
       val batch = handle.prepareBatch("""
-        INSERT INTO $TABLE_NAME (group_id, project_path, issue_iid, title, description, created_at, author, closed_at, closed_by, state, labels, assignees, notes) 
-        VALUES (:group_id, :project_path, :issue_iid, :title, :description, :created_at, :author, :closed_at, :closed_by, :state, :labels, :assignees, :notes)
+        INSERT INTO $TABLE_NAME (group_id, project_path, issue_iid, title, description, created_at, author, closed_at, closed_by, state, labels, assignees, notes, milestone) 
+        VALUES (:group_id, :project_path, :issue_iid, :title, :description, :created_at, :author, :closed_at, :closed_by, :state, :labels, :assignees, :notes, :milestone)
         ON CONFLICT (group_id, project_path, issue_iid) DO UPDATE
-        SET title=:title, description=:description, created_at=:created_at, author=:author, closed_at=:closed_at, closed_by=:closed_by, state=:state, labels=:labels, assignees=:assignees, notes=:notes
+        SET title=:title, description=:description, created_at=:created_at, author=:author, closed_at=:closed_at, closed_by=:closed_by, state=:state, labels=:labels, assignees=:assignees, notes=:notes, milestone=:milestone
       """.trimIndent())
 
       items.forEach {
@@ -42,6 +42,7 @@ internal class PostgreSqlIssueAggregateRepository(
           .bind("labels", objectMapper.writeValueAsString(it.labels))
           .bind("assignees", objectMapper.writeValueAsString(it.assignees))
           .bind("notes", objectMapper.writeValueAsString(it.notes))
+          .bind("milestone", it.milestone?.let { milestone -> objectMapper.writeValueAsString(milestone) })
           .add()
       }
 

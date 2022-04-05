@@ -60,7 +60,6 @@ internal open class GitlabCrawler(
         .projects
         // Archived projects can we discard immediately
         .filter { !it.isArchived }
-//        .filter { it.id == 15903L } // TODO(fredrfli) Remove, so we can crawl all sites
         .map { project ->
           gitlabProjectClient.publish(GitlabCrawlProjectEvent(
             rootGroupId = COURSE_ROOT_GROUP_NAME,

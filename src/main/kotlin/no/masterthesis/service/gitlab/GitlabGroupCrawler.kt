@@ -30,7 +30,6 @@ class GitlabGroupCrawler(
     val aggregatedGroups = subgroups
       .map {
         log.info("Retrieving projects for subgroup", kv("subgroup", it))
-        Thread.sleep(5) // This used to reduce the immediate strain on gitlab
         GitlabAggregatedGroup(
           baseGroupPath = groupPath,
           groupId = it.path,

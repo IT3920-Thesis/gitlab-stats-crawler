@@ -1,0 +1,1 @@
+ALTER TABLE issueaggregate ADD COLUMN milestone JSONB DEFAULT NULL;

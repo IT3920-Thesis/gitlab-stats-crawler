@@ -36,6 +36,7 @@ data class GitlabIssueAggregate(
   val assignees: Set<String>,
   val relatedIssues: Set<String>,
   val notes: List<Note>,
+  val milestone: Milestone? = null,
 ) {
   data class Title(
     val length: Int,
@@ -52,5 +53,10 @@ data class GitlabIssueAggregate(
     val bodyLength: Long,
     val author: String,
     val createdAt: ZonedDateTime,
+  )
+
+  data class Milestone(
+    val iid: String,
+    val title: String,
   )
 }

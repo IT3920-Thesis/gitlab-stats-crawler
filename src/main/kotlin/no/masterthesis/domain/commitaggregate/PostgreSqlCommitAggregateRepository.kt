@@ -22,10 +22,10 @@ internal class PostgreSqlCommitAggregateRepository(
     jdbi.withHandle<Unit, Exception> { handle ->
       @Suppress("MaxLineLength")
       val batch = handle.prepareBatch("""
-        INSERT INTO $TABLE_NAME (group_id, project_path, commit_sha, author_email, commit_time, size, title, message, files_changed, test_classification, gitlab_issues_referenced, is_merge_commit) 
-        VALUES (:group_id, :project_path, :commit_sha, :author_email, :commit_time, :size, :title, :message, :files_changed, :test_classification, :gitlab_issues_referenced, :is_merge_commit)
+        INSERT INTO $TABLE_NAME (group_id, project_path, commit_sha, author_email, commit_time, size, title, message, files_changed, test_classification, gitlab_issues_referenced, is_merge_commit, co_author) 
+        VALUES (:group_id, :project_path, :commit_sha, :author_email, :commit_time, :size, :title, :message, :files_changed, :test_classification, :gitlab_issues_referenced, :is_merge_commit, :co_author)
         ON CONFLICT (group_id, project_path, commit_sha, author_email) DO UPDATE
-        SET commit_time=:commit_time, size=:size, title=:title, message=:message, files_changed=:files_changed, test_classification=:test_classification, gitlab_issues_referenced=:gitlab_issues_referenced, is_merge_commit=:is_merge_commit
+        SET commit_time=:commit_time, size=:size, title=:title, message=:message, files_changed=:files_changed, test_classification=:test_classification, gitlab_issues_referenced=:gitlab_issues_referenced, is_merge_commit=:is_merge_commit, co_author=:co_author
       """.trimIndent())
 
       commits.forEach {
@@ -42,6 +42,7 @@ internal class PostgreSqlCommitAggregateRepository(
           .bind("test_classification", it.testClassification)
           .bind("is_merge_commit", it.isMergeCommit)
           .bind("gitlab_issues_referenced", objectMapper.writeValueAsString(it.gitLabIssuesReferenced))
+          .bind("co_author", objectMapper.writeValueAsString(it.coAuthor))
           .add()
       }
 

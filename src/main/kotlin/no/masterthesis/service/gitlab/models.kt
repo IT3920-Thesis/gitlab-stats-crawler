@@ -131,6 +131,20 @@ data class GitlabNote(
 
 @Introspected
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabMilestone(
+  val id: Long,
+  val iid: Long,
+  val title: String,
+  val description: String,
+  val state: String,
+  val createdAt: ZonedDateTime,
+  val updatedAt: ZonedDateTime,
+  val dueDate: ZonedDateTime? = null,
+  val startDate: ZonedDateTime? = null,
+)
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class GitlabIssue(
   val id: String,
   val iid: Long,
@@ -148,4 +162,5 @@ data class GitlabIssue(
   val createdAt: ZonedDateTime,
   val closedAt: ZonedDateTime? = null,
   val closedBy: GitlabUser? = null,
+  val milestone: GitlabMilestone? = null,
 )

@@ -17,6 +17,7 @@ data class CommitAggregate(
   val isMergeCommit: Boolean,
 
   val gitLabIssuesReferenced: Set<String> = emptySet(),
+  val coAuthor: Set<String> = emptySet(),
 ) {
   data class Title(
     val length: Int,
