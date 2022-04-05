@@ -53,6 +53,7 @@ internal class MilestoneListener(
       )
     }
 
+    log.info("Saving aggregated milestones to db...", kv("milestones", aggregates.size), kv("projectId", event.projectId))
     repository.saveAll(aggregates)
   }
 }
