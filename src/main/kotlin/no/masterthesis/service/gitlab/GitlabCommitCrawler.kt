@@ -83,7 +83,7 @@ open class GitlabCommitCrawler(
 
   private fun retrieveAllDiffs(projectId: Long, commitSha: Set<String>): Map<String, List<GitlabGitCommitDiff>> {
     val diffs = commitSha
-      .chunked(10)
+      .chunked(100)
       .flatMap { commits ->
         runBlocking {
           delay(5)
