@@ -4,6 +4,7 @@ import io.micronaut.rabbitmq.annotation.Queue
 import io.micronaut.rabbitmq.annotation.RabbitListener
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import java.time.ZoneOffset
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments.kv
@@ -47,8 +48,8 @@ internal class MilestoneListener(
         ),
         createdAt = milestone.createdAt,
         closedAt = milestone.closedAt,
-        startDate = milestone.startDate,
-        dueDate = milestone.dueDate,
+        startDate = milestone.startDate?.atStartOfDay(ZoneOffset.UTC),
+        dueDate = milestone.dueDate?.atStartOfDay(ZoneOffset.UTC),
         expired = milestone.expired,
       )
     }

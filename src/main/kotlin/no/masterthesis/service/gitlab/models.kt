@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import io.micronaut.core.annotation.Introspected
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.Base64
 
@@ -89,6 +90,8 @@ data class GitlabProject(
   val pathWithNamespace: String,
   val description: String?,
   val webUrl: String,
+  // TODO(fredrfli) Use this to avoid crawling already up-to-date projects (Less strain on gitlab)
+  val lastActivityAt: ZonedDateTime,
 )
 
 @Introspected
@@ -140,8 +143,8 @@ data class GitlabMilestone(
   val createdAt: ZonedDateTime,
   val updatedAt: ZonedDateTime,
   val closedAt: ZonedDateTime? = null,
-  val dueDate: ZonedDateTime? = null,
-  val startDate: ZonedDateTime? = null,
+  val dueDate: LocalDate? = null,
+  val startDate: LocalDate? = null,
   val expired: Boolean = false,
 )
 
