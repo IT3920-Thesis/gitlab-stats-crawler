@@ -35,7 +35,7 @@ internal class RabbitMQChannelPoolInitializer : ChannelInitializer() {
       RABBITMQ_CRAWL_CONTRIBUTION_ID,
       RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID,
       RABBITMQ_QUEUE_ISSUE_AGGREGATE_ID,
-      RABBITMQ_QUEUE_MILESTONE_AGGREGATE_ID
+      RABBITMQ_QUEUE_MILESTONE_AGGREGATE_ID,
     ).map {
       val queue = channel.queueDeclare(
         it,
@@ -57,10 +57,8 @@ internal class RabbitMQChannelPoolInitializer : ChannelInitializer() {
     )
 
     // Let every queue subscribe to the fanout exchange
-//    queues.forEach { (_, queue) ->
-//      channel.queueBind(queue.queue, RABBITMQ_FANOUT_PROJECT_CRAWLED, "", mapOf("x-match" to "all"))
-//    }
-
-    channel.queueBind(RABBITMQ_QUEUE_MILESTONE_AGGREGATE_ID, RABBITMQ_FANOUT_PROJECT_CRAWLED, "", mapOf("x-match" to "all"))
+    queues.forEach { (_, queue) ->
+      channel.queueBind(queue.queue, RABBITMQ_FANOUT_PROJECT_CRAWLED, "", mapOf("x-match" to "all"))
+    }
   }
 }

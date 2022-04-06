@@ -55,11 +55,14 @@ internal open class GitlabCrawler(
     // These subgroups represent the group a team is member of
     val subGroups = runBlocking { groupCrawler.crawlGitlabGroup(COURSE_ROOT_GROUP_NAME) }
 
+    @Suppress("MagicNumber")
     subGroups.map { subGroup ->
       subGroup
         .projects
         // Archived projects can we discard immediately
         .filter { !it.isArchived }
+        // TODO(fredrfli) Remove when we wish to crawl all projects
+        .filter { setOf(16111L, 15463L, 15450L).contains(it.id) }
         .map { project ->
           gitlabProjectClient.publish(GitlabCrawlProjectEvent(
             rootGroupId = COURSE_ROOT_GROUP_NAME,
