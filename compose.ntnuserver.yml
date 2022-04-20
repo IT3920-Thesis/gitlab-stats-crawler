@@ -27,7 +27,7 @@ services:
       RABBITMQ_USER: 'user'
       RABBITMQ_HOST: 'amqp://rabbitmq'
       # This group https://gitlab.stud.idi.ntnu.no/it1901/groups-2021
-      COURSE_ROOT_GROUP_PATH: 'it1901%2Fgroups-2021'
+      COURSE_ROOT_GROUP_PATH: '7393'
   rabbitmq:
     image: rabbitmq:3
     environment:

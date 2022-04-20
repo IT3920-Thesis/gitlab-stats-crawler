@@ -59,8 +59,11 @@ internal class RabbitMQChannelPoolInitializer : ChannelInitializer() {
     )
 
     // Let every queue subscribe to the fanout exchange
-    queues.forEach { (_, queue) ->
-      channel.queueBind(queue.queue, RABBITMQ_FANOUT_PROJECT_CRAWLED, "", mapOf("x-match" to "all"))
-    }
+    queues
+      // Change contribution is temporarily disabled
+      .filter { it.key != RABBITMQ_CRAWL_CONTRIBUTION_ID }
+      .forEach { (_, queue) ->
+        channel.queueBind(queue.queue, RABBITMQ_FANOUT_PROJECT_CRAWLED, "", mapOf("x-match" to "all"))
+      }
   }
 }

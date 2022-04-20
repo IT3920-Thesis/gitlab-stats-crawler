@@ -16,7 +16,7 @@ PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
 # List subgroups
-GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it1901%2Fgroups-2021/subgroups
+GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/7393/subgroups
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
