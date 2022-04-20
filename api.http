@@ -48,6 +48,11 @@ GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/16111/issues/12/notes?per_pa
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
-GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/16111/milestones?per_page=100&page=1
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/16111/
+PRIVATE-TOKEN: {{gitlabAccessToken}}
+
+
+###
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/16111/merge_requests/11/notes
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 

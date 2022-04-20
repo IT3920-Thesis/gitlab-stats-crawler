@@ -66,6 +66,8 @@ jackson:
     adjustDatesToContextTimeZone: false
   json-view:
     enabled: true
+  mapper:
+    ACCEPT_CASE_INSENSITIVE_ENUMS: true
 
 datasources:
   default:

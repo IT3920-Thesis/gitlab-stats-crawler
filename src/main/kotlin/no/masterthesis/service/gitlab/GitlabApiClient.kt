@@ -17,6 +17,7 @@ data class GitlabErrorResponse(
   val message: String,
 )
 
+@Suppress("TooManyFunctions")
 @Client(
   id = GITLAB_API_CLIENT_PREFIX,
   errorType = GitlabErrorResponse::class,
@@ -141,4 +142,34 @@ interface GitlabApiClient {
     projectId: Long,
     page: Int = 1,
   ): Publisher<List<GitlabMilestone>>
+
+  /**
+   * Lists all merge requests
+   *
+   * @param projectId
+   * */
+  @Get(
+    uri = "/api/v4/projects/{projectId}/merge_requests?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listMergeRequests(
+    projectId: Long,
+    page: Int = 1,
+  ): Publisher<List<GitlabMergeRequest>>
+
+  /**
+   * Lists all notes (comments) on an issue
+   *
+   * @param projectId
+   * @param iId (Not a typo) The iid for a Merge Request
+   * */
+  @Get(
+    uri = "/api/v4/projects/{projectId}/merge_requests/{iId}/notes?per_page=$GITLAB_MAX_ITEM_PER_PAGE&page={page}",
+    consumes = [MediaType.APPLICATION_JSON],
+  )
+  fun listNotesInMergeRequest(
+    projectId: Long,
+    iId: Long,
+    page: Int = 1,
+  ): Publisher<List<GitlabNote>>
 }

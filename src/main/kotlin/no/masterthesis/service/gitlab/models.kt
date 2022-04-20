@@ -130,6 +130,7 @@ data class GitlabNote(
   val author: GitlabUser,
   val createdAt: ZonedDateTime,
   val updatedAt: ZonedDateTime,
+  val system: Boolean,
 )
 
 @Introspected
@@ -169,3 +170,33 @@ data class GitlabIssue(
   val closedBy: GitlabUser? = null,
   val milestone: GitlabMilestone? = null,
 )
+
+@Introspected
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class GitlabMergeRequest(
+  val id: Long,
+  val iid: Long,
+  val projectId: Long,
+  val title: String,
+  val description: String,
+  val state: State,
+  val createdAt: ZonedDateTime,
+  val mergedBy: GitlabUser? = null,
+  val mergeUser: GitlabUser? = null,
+  val mergedAt: ZonedDateTime? = null,
+  val closedBy: GitlabUser? = null,
+  val updatedAt: ZonedDateTime? = null,
+  val closedAt: ZonedDateTime? = null,
+  val targetBranch: String,
+  val sourceBranch: String,
+  val author: GitlabUser,
+  val assignees: List<GitlabUser> = emptyList(),
+  val reviewers: List<GitlabUser> = emptyList(),
+  val labels: Set<String>,
+  val draft: Boolean,
+  val milestone: GitlabMilestone? = null,
+  val mergeStatus: String,
+
+) {
+  enum class State { MERGED, OPENED, CLOSED, LOCKED }
+}

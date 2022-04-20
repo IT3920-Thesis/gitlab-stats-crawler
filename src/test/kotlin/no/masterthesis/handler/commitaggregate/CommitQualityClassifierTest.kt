@@ -1,7 +1,7 @@
 package no.masterthesis.handler.commitaggregate
 
 import java.time.ZonedDateTime
-import no.masterthesis.handler.commitaggregate.CommitQualityClassifier.extractIssueIdsReferenced
+import no.masterthesis.util.CommitQualityClassifier.extractIssueIdsReferenced
 import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.service.gitlab.GitlabGitCommit
 import org.junit.jupiter.api.Test

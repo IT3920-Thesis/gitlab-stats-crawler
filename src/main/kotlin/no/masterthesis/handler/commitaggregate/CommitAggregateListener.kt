@@ -9,9 +9,10 @@ import no.masterthesis.domain.commitaggregate.CommitAggregate
 import no.masterthesis.domain.commitaggregate.CommitAggregateRepository
 import no.masterthesis.factory.RABBITMQ_QUEUE_COMMIT_AGGREGATE_ID
 import no.masterthesis.handler.GitlabCrawlProjectEvent
-import no.masterthesis.handler.commitaggregate.CommitQualityClassifier.isMergeCommit
+import no.masterthesis.util.CommitQualityClassifier.isMergeCommit
 import no.masterthesis.service.gitlab.GitlabCommitCrawler
 import no.masterthesis.service.gitlab.GitlabFileCrawler
+import no.masterthesis.util.CommitQualityClassifier
 import no.masterthesis.util.MailMapUtil
 import org.slf4j.LoggerFactory
 

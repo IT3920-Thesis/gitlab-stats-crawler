@@ -1,0 +1,5 @@
+package no.masterthesis.domain.mergerequest
+
+import no.masterthesis.domain.GenericWriteRepository
+
+interface MergeRequestAggregateRepository : GenericWriteRepository<MergeRequestAggregate>

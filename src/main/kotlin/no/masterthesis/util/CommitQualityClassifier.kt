@@ -1,4 +1,4 @@
-package no.masterthesis.handler.commitaggregate
+package no.masterthesis.util
 
 import kotlin.math.max
 import net.logstash.logback.argument.StructuredArguments.kv
@@ -8,7 +8,7 @@ import no.masterthesis.service.gitlab.GitCommit
 import no.masterthesis.util.ChangeContributionClassifier.predictContributionType
 import org.slf4j.LoggerFactory
 
-internal object CommitQualityClassifier {
+object CommitQualityClassifier {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   /**
@@ -91,7 +91,7 @@ internal object CommitQualityClassifier {
     return issuesInTitle.plus(issuesInMessage)
   }
 
-  private fun extractIssueIds(message: String): Set<String> {
+  fun extractIssueIds(message: String): Set<String> {
     val tokens = message
       .trim()
       .split("\n")
@@ -100,7 +100,7 @@ internal object CommitQualityClassifier {
     log.trace("Tokens", kv("tokens", tokens))
     return tokens
       .map { it.trim() }
-      .filter(::isIssueReference)
+      .filter(CommitQualityClassifier::isIssueReference)
       .toSet()
   }
 
