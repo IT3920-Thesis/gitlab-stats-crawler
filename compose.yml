@@ -32,6 +32,7 @@ services:
       RABBITMQ_USER: 'user'
       RABBITMQ_PASSWORD: 'somePassword'
       RABBITMQ_HOST: 'amqp://rabbitmq'
+      COURSE_ROOT_GROUP_PATH: 'it3920-gitlab-projects-examples'
   rabbitmq:
     image: rabbitmq:3
     environment:

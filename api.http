@@ -16,7 +16,7 @@ PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
 # List subgroups
-GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it3920-gitlab-projects-examples/subgroups
+GET https://gitlab.stud.idi.ntnu.no/api/v4/groups/it1901%2Fgroups-2021/subgroups
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 ###
@@ -53,6 +53,6 @@ PRIVATE-TOKEN: {{gitlabAccessToken}}
 
 
 ###
-GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/16111/merge_requests/11/notes
+GET https://gitlab.stud.idi.ntnu.no/api/v4/projects/16111/merge_requests?state=opened
 PRIVATE-TOKEN: {{gitlabAccessToken}}
 

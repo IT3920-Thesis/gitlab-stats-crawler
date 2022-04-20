@@ -9,3 +9,4 @@ datasources:
 
 gitlabapi:
   accessToken: n/a
+  courseRootGroupPath: it3920-gitlab-projects-examples

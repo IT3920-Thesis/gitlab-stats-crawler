@@ -76,6 +76,7 @@ resource "aws_apprunner_service" "application" {
           RABBITMQ_USER = random_string.rabbitmq_user.result
           RABBITMQ_PASSWORD = random_password.rabbitmq_password.result
           RABBITMQ_HOST = aws_mq_broker.rabbitmq.instances[0].endpoints[0]
+          COURSE_ROOT_GROUP_PATH = "it3920-gitlab-projects-examples"
         }
       }
       image_identifier = "${var.ecr_image_url}:${var.image_tag}"

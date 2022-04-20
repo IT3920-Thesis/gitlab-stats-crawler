@@ -1,0 +1,49 @@
+services:
+  # Database engine
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: gitlabstats
+      POSTGRES_DB: gitlabstats
+      POSTGRES_HOST_AUTH_METHOD: trust
+    env_file:
+      - secrets.env # Expects the field POSTGRES_PASSWORD
+    volumes:
+      - postgresql-storage:/var/lib/postgresql/data
+  app:
+    image: "314397620259.dkr.ecr.us-east-1.amazonaws.com/gitlab-stats-crawler:${IMAGE_TAG}"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - secrets.env # Expects the fields DATABASE_PASSWORD, RABBITMQ_PASSWORD, and GITLAB_ACCESS_TOKEN
+    environment:
+      DATABASE_USER: gitlabstats
+      DATABASE_URI: jdbc:postgresql://db:5432/gitlabstats?stringtype=unspecified
+      RABBITMQ_USER: 'user'
+      RABBITMQ_HOST: 'amqp://rabbitmq'
+      # This group https://gitlab.stud.idi.ntnu.no/it1901/groups-2021
+      COURSE_ROOT_GROUP_PATH: 'it1901%2Fgroups-2021'
+  rabbitmq:
+    image: rabbitmq:3
+    environment:
+      RABBITMQ_DEFAULT_USER: 'user'
+    env_file:
+      - secrets.env # Expects the field RABBITMQ_DEFAULT_PASS
+  grafana:
+    image: grafana/grafana:8.2.6
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      # It is by more easier to read text in light theme
+      GF_USERS_DEFAULT_THEME: 'light'
+
+volumes:
+  grafana-storage:
+  postgresql-storage:

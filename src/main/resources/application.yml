@@ -85,8 +85,10 @@ flyway:
 
 gitlabapi:
   accessToken: ${GITLAB_ACCESS_TOKEN}
+  courseRootGroupPath: ${COURSE_ROOT_GROUP_PATH}
 
 rabbitmq:
   uri: ${RABBITMQ_HOST}
   username: ${RABBITMQ_USER}
   password: ${RABBITMQ_PASSWORD}
+
